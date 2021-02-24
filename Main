@@ -1,1 +1,9 @@
-GamingBoyZ379/GamingBoyZ379-Hub
+local BloodMoonTycoon = 961409234
+local game2 = 7654321 
+
+if game.PlaceId == BloodMoonTycoon then
+  do  
+  print("You Have Loaded Blood Moon Tycoon GUI!")
+elseif game.PlaceId == game2 then
+  print("You're in game2!")
+end
