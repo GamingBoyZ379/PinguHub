@@ -1,10 +1,13 @@
 local BloodMoonTycoon = 961409234
-local game2 = 7654321 
+local BreakInStory = 3851622790
+local game3 = 1234567
 
 if game.PlaceId == BloodMoonTycoon then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua'))()  
-  print("You Have Loaded Blood Moon Tycoon GUI!")
+  
+elseif game.PlaceId == BreakInStory then
+  loadstring(game:HttpGet(''))()
 
-elseif game.PlaceId == game2 then
-  print("You're in game2!")
+elseif game.PlaceId == game3 then
+print('You're In game3!')
 end
