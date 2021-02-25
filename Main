@@ -10,7 +10,7 @@ elseif game.PlaceId == BreakInStory then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Break%20In%20(Story)%20GUI.lua'))()
 
 elseif game.PlaceId == BreakInStoryLobby then
- warn ('You Must Load Into An Actual Round Before Loading Break In (Story) GUI')
+ print ('You Must Load Into An Actual Round Before Loading Break In (Story) GUI')
 
 elseif game.PlaceId == game3 then
  print ('You Have Loaded Game 3!')
