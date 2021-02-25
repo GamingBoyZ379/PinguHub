@@ -8,6 +8,6 @@ if game.PlaceId == BloodMoonTycoon then
 elseif game.PlaceId == BreakInStory then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Break%20In%20(Story)%20GUI.lua'))()
 
-elseif game.PlaceId == game3 then
+if game.PlaceId == game3 then
 print('You're In game3!')
 end
