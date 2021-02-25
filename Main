@@ -1,5 +1,5 @@
 local BloodMoonTycoon = 961409234
-local BreakInStory = 3851622790
+local BreakInStory = 4620170611
 local game3 = 1234567
 
 if game.PlaceId == BloodMoonTycoon then
