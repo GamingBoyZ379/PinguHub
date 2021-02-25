@@ -13,10 +13,9 @@ elseif game.PlaceId == BreakInStoryLobby then
  warn ('You Must Load Into An Actual Round Before Loading Break In (Story) GUI')
 
 elseif game.PlaceId == game3 then
- print ('You Have Loaded Game 3!")
+ print ('You Have Loaded Game 3!')
 
 setfflag("AbuseReportScreenshotPercentage", 0)
 
 setfflag("DFFlagAbuseReportScreenshot", "False")
 end
-end)
