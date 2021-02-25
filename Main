@@ -11,6 +11,7 @@ elseif game.PlaceId == BreakInStory then
 
 elseif game.PlaceId == BreakInStoryLobby then
  warn ('You Must Load Into An Actual Round Before Loading Break In (Story) GUI')
+end)
 
 elseif game.PlaceId == game3 then
  print ('You Have Loaded Game 3!")
