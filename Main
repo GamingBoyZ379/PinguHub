@@ -1,9 +1,10 @@
 local BloodMoonTycoon = 961409234
 local BreakInStory = 4620170611
-local game3 = 1234567
 
 if game.PlaceId == BloodMoonTycoon then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua'))()  
   
 elseif game.PlaceId == BreakInStory then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Break%20In%20(Story)%20GUI.lua'))()
+
+end
