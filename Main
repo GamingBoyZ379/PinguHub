@@ -1,3 +1,7 @@
+setfflag("AbuseReportScreenshotPercentage", 0)
+
+setfflag("DFFlagAbuseReportScreenshot", "False")
+
 local BloodMoonTycoon = 961409234
 local BreakInStory = 4620170611
 local BreakInStoryLobby = 3851622790
@@ -20,7 +24,4 @@ elseif game.PlaceId == BGS then
  elseif game.PlaceId == game4 then
  print ('You Have Loaded Game 4!')
 
-setfflag("AbuseReportScreenshotPercentage", 0)
-
-setfflag("DFFlagAbuseReportScreenshot", "False")
 end
