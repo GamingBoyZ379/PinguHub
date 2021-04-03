@@ -1,7 +1,8 @@
 local BloodMoonTycoon = 961409234
 local BreakInStory = 4620170611
 local BreakInStoryLobby = 3851622790
-local game3 = 1234567
+local BGS = 2512643572
+local game4 = 1234567
 
 if game.PlaceId == BloodMoonTycoon then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua'))()  
@@ -12,8 +13,12 @@ elseif game.PlaceId == BreakInStory then
 elseif game.PlaceId == BreakInStoryLobby then
  print ('You Must Load Into An Actual Round Before Loading Break In (Story) GUI')
 
-elseif game.PlaceId == game3 then
- print ('You Have Loaded Game 3!')
+elseif game.PlaceId == BGS then
+ loadstring(game:HttpGet(("https://textbin.net/raw/b8nappl9mg"),true))()
+ print ('You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640')
+ 
+ elseif game.PlaceId == game4 then
+ print ('You Have Loaded Game 4!')
 
 setfflag("AbuseReportScreenshotPercentage", 0)
 
