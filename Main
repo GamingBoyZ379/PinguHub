@@ -21,7 +21,7 @@ elseif game.PlaceId == BGS then
  
  elseif game.PlaceId == MOTG then
  --Normal GUI
- loadstring(game:HttpGet(("https://pastebin.com/raw/ZeBsDBFd"),true))()
+loadstring(game:HttpGet(("https://pastebin.com/raw/ZeBsDBFd"),true))()
  --Extra GUI
 loadstring(game:HttpGet(("https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/MOTG%20Extras%20GUI"),true))()
  print ('You Have Loaded MOTG GUI')
