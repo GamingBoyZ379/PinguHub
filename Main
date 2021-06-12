@@ -4,7 +4,7 @@ local BreakInStoryLobby = 3851622790
 local BGS = 2512643572
 local MOTG = 464914388
 local MOTGLobby = 481987774 
-local game5 = 1234567
+local Build A Boat = 537413528
 
 if game.PlaceId == BloodMoonTycoon then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua'))()  
@@ -30,8 +30,12 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/GamingBoyZ379/PinguH
  print ('You Must Load Into A Island Before Loading MOTG GUI')
 
  
- elseif game.PlaceId == game5 then
- print ('You Have Loaded Game 5!')
+ elseif game.PlaceId == Build A Boat then
+ print ('You Have Loaded Build A Boat For Treasure GUI!')
+
+ elseif game.PlaceId == game6 then
+ print ('You Have Loaded Game 6!')
+
 
 
 end
