@@ -5,6 +5,7 @@ local BGS = 2512643572
 local MOTG = 464914388
 local MOTGLobby = 481987774 
 local Build A Boat = 537413528
+local game6 = 1234567
 
 if game.PlaceId == BloodMoonTycoon then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua'))()  
