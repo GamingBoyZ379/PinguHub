@@ -16,7 +16,7 @@ elseif game.PlaceId == BreakInStoryLobby then
  print ('You Must Load Into An Actual Round Before Loading Break In (Story) GUI')
 
 elseif game.PlaceId == BGS then
- https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua
+  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua'))()  
  print ('You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640')
  
  elseif game.PlaceId == MOTG then
