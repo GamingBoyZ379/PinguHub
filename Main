@@ -2,10 +2,7 @@ local BloodMoonTycoon = 961409234
 local BreakInStory = 4620170611
 local BreakInStoryLobby = 3851622790
 local BGS = 2512643572
-local MOTG = 464914388
-local MOTGLobby = 481987774 
-local BuildABoat = 537413528
-local game6 = 1234567
+local game5 = 1234567
 
 if game.PlaceId == BloodMoonTycoon then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua'))()  
@@ -20,22 +17,8 @@ elseif game.PlaceId == BGS then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua'))()  
  print ('You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640')
  
- elseif game.PlaceId == MOTG then
- --Normal GUI
-loadstring(game:HttpGet(("https://pastebin.com/raw/ZeBsDBFd"),true))()
- --Extra GUI
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/MOTG%20Extras%20GUI"),true))()
- print ('You Have Loaded MOTG GUI')
- 
-  elseif game.PlaceId == MOTGLobby then
- print ('You Must Load Into A Island Before Loading MOTG GUI')
-
- 
- elseif game.PlaceId == BuildABoat then
- print ('You Have Loaded Build A Boat For Treasure GUI!')
-
- elseif game.PlaceId == game6 then
- print ('You Have Loaded Game 6!')
+ elseif game.PlaceId == game5 then
+ print ('You Have Loaded Game 5!')
 
 
 
