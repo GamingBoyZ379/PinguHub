@@ -142,7 +142,8 @@ TrapHub.Font = Enum.Font.SourceSansSemibold
 TrapHub.Text = "Trap Hub"
 TrapHub.TextColor3 = Color3.fromRGB(0, 0, 0)
 TrapHub.TextSize = 14.000
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/TrapstarKSSKSKSKKS/Main/main/Project%20Slayer"))()
+TrapHub.MouseButton1Down:connect(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/TrapstarKSSKSKSKKS/Main/main/Project%20Slayer"))()
 end)
 
 SpinLabel.Name = "SpinLabel"
