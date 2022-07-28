@@ -50,8 +50,8 @@ RedeemCodes.TextSize = 14.000
 RedeemCodes.TextWrapped = true
 RedeemCodes.MouseButton1Down:connect(function()
 	game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("300klikes!");
-	game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("shutdownnumb2");
-	game:GetService("TeleportService"):Teleport(5956785391); 
+	 game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("shutdownnumb2");
+	  game:GetService("TeleportService"):Teleport(5956785391); 
 print ('Teleporting To Main Menu...')
 end)
 
