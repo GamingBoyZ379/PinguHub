@@ -139,7 +139,7 @@ TrapHub.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 TrapHub.Position = UDim2.new(0.559663773, 0, 0.762541831, 0)
 TrapHub.Size = UDim2.new(0, 166, 0, 41)
 TrapHub.Font = Enum.Font.SourceSansSemibold
-TrapHub.Text = "TrapHub"
+TrapHub.Text = "Trap Hub"
 TrapHub.TextColor3 = Color3.fromRGB(0, 0, 0)
 TrapHub.TextSize = 14.000
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/TrapstarKSSKSKSKKS/Main/main/Project%20Slayer"))()
