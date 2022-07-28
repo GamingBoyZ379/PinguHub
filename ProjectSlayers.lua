@@ -11,7 +11,7 @@ local UseSpins = Instance.new("TextButton")
 local LazyHub = Instance.new("TextButton")
 local SpotifyHub = Instance.new("TextButton")
 local LeadmarkerHub = Instance.new("TextButton")
-local SolixoScript = Instance.new("TextButton")
+local TrapHub = Instance.new("TextButton")
 local SpinLabel = Instance.new("TextLabel")
 local OtherHubsLabel = Instance.new("TextLabel")
 
