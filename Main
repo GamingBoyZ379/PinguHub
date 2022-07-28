@@ -1,26 +1,32 @@
+local BloodMoonTycoon = 961409234
 local BreakInStory = 4620170611
 local BreakInStoryLobby = 3851622790
 local BGS = 2512643572
-local game5 = 1234567
 local ProjectSlayers = 5956785391
 local ProjectSlayersMap = 6152116144
 local game6 = 1234567
 
 if game.PlaceId == BloodMoonTycoon then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua'))()  
- elseif game.PlaceId == BGS then
+  
+elseif game.PlaceId == BreakInStory then
+  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Break%20In%20(Story)%20GUI.lua'))()
+
+elseif game.PlaceId == BreakInStoryLobby then
+ print ('You Must Load Into An Actual Round Before Loading Break In (Story) GUI')
+
+elseif game.PlaceId == BGS then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua'))()  
  print ('You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640')
-
- elseif game.PlaceId == game5 then
- print ('You Have Loaded Game 5!')
+ 
  elseif game.PlaceId == ProjectSlayers then
- loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/ProjectSlayers.lua'))()
- print ('You Are Loaded Into The Project Slayers Menu')
+  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/ProjectSlayers.lua'))()  
+   print ('You Have Loaded Project Slayers Menu')
+ 
+ elseif game.PlaceId == ProjectSlayersMap then
+  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/ProjectSlayers.lua'))()  
+   print ('You Have Loaded Project Slayers Map')
 
-elseif game.PlaceId == ProjectSlayersMap then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/ProjectSlayers.lua`))()
-print ('You Are Loaded Into The Project Slayers Map')
 
-elseif game.PlaceId == game6 then
- print ('You Have Loaded Game 6!')
+
+end
