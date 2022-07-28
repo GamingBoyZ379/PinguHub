@@ -17,8 +17,7 @@ elseif game.PlaceId == BreakInStoryLobby then
 
 elseif game.PlaceId == BGS then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua'))()  
- print ('You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640')
- 
+
  elseif game.PlaceId == ProjectSlayers then
  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/ProjectSlayers.lua'))()
 
