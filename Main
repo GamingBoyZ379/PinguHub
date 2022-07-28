@@ -30,6 +30,4 @@ print ('You Are Loaded Into The Project Slayers Map')
 elseif game.PlaceId == game6 then
  print ('You Have Loaded Game 6!')
 
-
-
 end
