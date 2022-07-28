@@ -21,11 +21,9 @@ elseif game.PlaceId == BGS then
  
  elseif game.PlaceId == ProjectSlayers then
  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/ProjectSlayers.lua'))()
- print ('You Are Loaded Into The Project Slayers Menu')
 
 elseif game.PlaceId == ProjectSlayersMap then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/ProjectSlayers.lua))()
-print ('You Are Loaded Into The Project Slayers Map')
 
 elseif game.PlaceId == game6 then
  print ('You Have Loaded Game 6!')
