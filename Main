@@ -26,4 +26,3 @@ elseif game.PlaceId == ProjectSlayersMap then
 
 elseif game.PlaceId == game6 then
  print ('You Have Loaded Game 6!')
-end
