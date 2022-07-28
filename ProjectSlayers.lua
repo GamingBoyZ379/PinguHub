@@ -173,7 +173,7 @@ OtherHubsLabel.TextWrapped = true
 
 -- Scripts:
 
-local function SKTHGY_fake_script() -- ProjectSlayersGui.Draggable 
+local function HYOTSSO_fake_script() -- ProjectSlayersGui.Draggable 
 	local script = Instance.new('LocalScript', ProjectSlayersGui)
 
 	frame = script.Parent.Frame
@@ -183,4 +183,4 @@ local function SKTHGY_fake_script() -- ProjectSlayersGui.Draggable
 	
 	
 end
-coroutine.wrap(SKTHGY_fake_script)()
+coroutine.wrap(HYOTSSO_fake_script)()
