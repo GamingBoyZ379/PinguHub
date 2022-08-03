@@ -49,10 +49,7 @@ RedeemCodes.TextColor3 = Color3.fromRGB(0, 0, 0)
 RedeemCodes.TextSize = 14.000
 RedeemCodes.TextWrapped = true
 RedeemCodes.MouseButton1Down:connect(function()
-	game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("anotherdayanothershutdown");
-	 game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("shutdownnumb2");
-	  game:GetService("TeleportService"):Teleport(5956785391); 
-print ('Teleporting To Main Menu...')
+	game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("350Kupvotes!");
 end)
 
 UseSpins.Name = "UseSpins"
