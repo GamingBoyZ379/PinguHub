@@ -49,7 +49,8 @@ RedeemCodes.TextColor3 = Color3.fromRGB(0, 0, 0)
 RedeemCodes.TextSize = 14.000
 RedeemCodes.TextWrapped = true
 RedeemCodes.MouseButton1Down:connect(function()
-	game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("sCyth3Showcase!");
+	game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("twittaspins");
+         game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("sCyth3Showcase!");
 end)
 
 UseSpins.Name = "UseSpins"
