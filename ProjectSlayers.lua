@@ -49,7 +49,7 @@ RedeemCodes.TextColor3 = Color3.fromRGB(0, 0, 0)
 RedeemCodes.TextSize = 14.000
 RedeemCodes.TextWrapped = true
 RedeemCodes.MouseButton1Down:connect(function()
-	game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("miniupd2");
+	game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("-1o0millvisits-_-");
          game:GetService("ReplicatedStorage").Remotes["send_code_to_server"]:FireServer("");
 end)
 
