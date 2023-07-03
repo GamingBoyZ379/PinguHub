@@ -1,4 +1,4 @@
-while true do if workspace[game.Players.LocalPlayer.Name].Humanoid.Health >= 150 then
+while true do if game.Players.LocalPlayer.Character.Humanoid.Health >= 150 then
 wait(0.05)
 game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("To_Server"):WaitForChild("water_damage"):FireServer()
 end
