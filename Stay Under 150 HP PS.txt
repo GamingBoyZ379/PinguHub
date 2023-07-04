@@ -4,7 +4,3 @@ game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("To_Se
 end
 wait()
 end
-
-while true do wait(30)
-game:GetService("ReplicatedStorage").Remotes.clan_furiosity_add:FireServer(true)
-end
