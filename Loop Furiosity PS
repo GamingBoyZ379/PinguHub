@@ -1,0 +1,3 @@
+while true do wait(30)
+game:GetService("ReplicatedStorage").Remotes.clan_furiosity_add:FireServer(true)
+end
