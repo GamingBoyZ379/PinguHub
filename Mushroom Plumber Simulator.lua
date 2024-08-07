@@ -16,11 +16,11 @@ local PlayerFrame = Instance.new("Frame")
 local InfiniteStamina = Instance.new("TextButton")
 local WorldFrame = Instance.new("Frame")
 local CoinBlockHitbox1 = Instance.new("TextButton")
-local CoinBlockHitbox2 = Instance.new("TextButton")
 local TPDrops = Instance.new("TextButton")
-local TPToOmni = Instance.new("TextButton")
 local MobEsp = Instance.new("TextButton")
 local LuckyBlockOpen = Instance.new("TextButton")
+local MobTP = Instance.new("TextButton")
+local TPToOmni = Instance.new("TextButton")
 local HideMenu = Instance.new("TextButton")
 local OpenUniversal = Instance.new("TextButton")
 local UICorner_2 = Instance.new("UICorner")
@@ -30,6 +30,8 @@ local KingTurtCastle = Instance.new("TextButton")
 local StatReset = Instance.new("TextButton")
 local PawnShop = Instance.new("TextButton")
 local GunDealer = Instance.new("TextButton")
+local SkinSell = Instance.new("TextButton")
+local AFKSpot = Instance.new("TextButton")
 
 --Properties:
 
@@ -159,19 +161,6 @@ CoinBlockHitbox1.TextScaled = true
 CoinBlockHitbox1.TextSize = 14.000
 CoinBlockHitbox1.TextWrapped = true
 
-CoinBlockHitbox2.Name = "CoinBlockHitbox2"
-CoinBlockHitbox2.Parent = WorldFrame
-CoinBlockHitbox2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-CoinBlockHitbox2.BorderColor3 = Color3.fromRGB(27, 42, 53)
-CoinBlockHitbox2.Position = UDim2.new(0.500000179, 0, 0.0118584773, 0)
-CoinBlockHitbox2.Size = UDim2.new(0, 200, 0, 40)
-CoinBlockHitbox2.Font = Enum.Font.SourceSans
-CoinBlockHitbox2.Text = "BIG Coin Block Hitbox"
-CoinBlockHitbox2.TextColor3 = Color3.fromRGB(0, 0, 0)
-CoinBlockHitbox2.TextScaled = true
-CoinBlockHitbox2.TextSize = 14.000
-CoinBlockHitbox2.TextWrapped = true
-
 TPDrops.Name = "TPDrops"
 TPDrops.Parent = WorldFrame
 TPDrops.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -184,19 +173,6 @@ TPDrops.TextColor3 = Color3.fromRGB(0, 0, 0)
 TPDrops.TextScaled = true
 TPDrops.TextSize = 14.000
 TPDrops.TextWrapped = true
-
-TPToOmni.Name = "TPToOmni"
-TPToOmni.Parent = WorldFrame
-TPToOmni.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-TPToOmni.BorderColor3 = Color3.fromRGB(27, 42, 53)
-TPToOmni.Position = UDim2.new(0.500000179, 0, 0.369001329, 0)
-TPToOmni.Size = UDim2.new(0, 200, 0, 40)
-TPToOmni.Font = Enum.Font.SourceSans
-TPToOmni.Text = "TP Omni Room"
-TPToOmni.TextColor3 = Color3.fromRGB(0, 0, 0)
-TPToOmni.TextScaled = true
-TPToOmni.TextSize = 14.000
-TPToOmni.TextWrapped = true
 
 MobEsp.Name = "MobEsp"
 MobEsp.Parent = WorldFrame
@@ -223,6 +199,32 @@ LuckyBlockOpen.TextColor3 = Color3.fromRGB(0, 0, 0)
 LuckyBlockOpen.TextScaled = true
 LuckyBlockOpen.TextSize = 14.000
 LuckyBlockOpen.TextWrapped = true
+
+MobTP.Name = "MobTP"
+MobTP.Parent = WorldFrame
+MobTP.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+MobTP.BorderColor3 = Color3.fromRGB(27, 42, 53)
+MobTP.Position = UDim2.new(0.500000179, 0, 0.369001329, 0)
+MobTP.Size = UDim2.new(0, 200, 0, 40)
+MobTP.Font = Enum.Font.SourceSans
+MobTP.Text = "BIG Coin Block Hitbox"
+MobTP.TextColor3 = Color3.fromRGB(0, 0, 0)
+MobTP.TextScaled = true
+MobTP.TextSize = 14.000
+MobTP.TextWrapped = true
+
+TPToOmni.Name = "TPToOmni"
+TPToOmni.Parent = WorldFrame
+TPToOmni.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TPToOmni.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TPToOmni.Position = UDim2.new(0.500000179, 0, 0.0118584773, 0)
+TPToOmni.Size = UDim2.new(0, 200, 0, 40)
+TPToOmni.Font = Enum.Font.SourceSans
+TPToOmni.Text = "TP Omni Room (W.I.P)"
+TPToOmni.TextColor3 = Color3.fromRGB(0, 0, 0)
+TPToOmni.TextScaled = true
+TPToOmni.TextSize = 14.000
+TPToOmni.TextWrapped = true
 
 HideMenu.Name = "HideMenu"
 HideMenu.Parent = MainFrame
@@ -274,8 +276,8 @@ KingTurtCastle.Name = "KingTurtCastle"
 KingTurtCastle.Parent = TPFrame
 KingTurtCastle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 KingTurtCastle.BorderColor3 = Color3.fromRGB(27, 42, 53)
-KingTurtCastle.Position = UDim2.new(0, 0, 0.00714284182, 0)
-KingTurtCastle.Size = UDim2.new(0, 200, 0, 50)
+KingTurtCastle.Position = UDim2.new(0, 0, 0.00714285718, 0)
+KingTurtCastle.Size = UDim2.new(0, 200, 0, 40)
 KingTurtCastle.Font = Enum.Font.SourceSans
 KingTurtCastle.Text = "King Turt Castle"
 KingTurtCastle.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -288,7 +290,7 @@ StatReset.Parent = TPFrame
 StatReset.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 StatReset.BorderColor3 = Color3.fromRGB(27, 42, 53)
 StatReset.Position = UDim2.new(0, 0, 0.364285707, 0)
-StatReset.Size = UDim2.new(0, 200, 0, 50)
+StatReset.Size = UDim2.new(0, 200, 0, 40)
 StatReset.Font = Enum.Font.SourceSans
 StatReset.Text = "Stat Reset"
 StatReset.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -301,7 +303,7 @@ PawnShop.Parent = TPFrame
 PawnShop.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 PawnShop.BorderColor3 = Color3.fromRGB(27, 42, 53)
 PawnShop.Position = UDim2.new(0.499999553, 0, 0.00714285718, 0)
-PawnShop.Size = UDim2.new(0, 200, 0, 50)
+PawnShop.Size = UDim2.new(0, 200, 0, 40)
 PawnShop.Font = Enum.Font.SourceSans
 PawnShop.Text = "Pawn Shop"
 PawnShop.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -314,13 +316,39 @@ GunDealer.Parent = TPFrame
 GunDealer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 GunDealer.BorderColor3 = Color3.fromRGB(27, 42, 53)
 GunDealer.Position = UDim2.new(0.499999553, 0, 0.364285707, 0)
-GunDealer.Size = UDim2.new(0, 200, 0, 50)
+GunDealer.Size = UDim2.new(0, 200, 0, 40)
 GunDealer.Font = Enum.Font.SourceSans
 GunDealer.Text = "Gun Dealer"
 GunDealer.TextColor3 = Color3.fromRGB(0, 0, 0)
 GunDealer.TextScaled = true
 GunDealer.TextSize = 14.000
 GunDealer.TextWrapped = true
+
+SkinSell.Name = "SkinSell"
+SkinSell.Parent = TPFrame
+SkinSell.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SkinSell.BorderColor3 = Color3.fromRGB(27, 42, 53)
+SkinSell.Position = UDim2.new(0, 0, 0.714285493, 0)
+SkinSell.Size = UDim2.new(0, 200, 0, 40)
+SkinSell.Font = Enum.Font.SourceSans
+SkinSell.Text = "Dupe Skin Sell"
+SkinSell.TextColor3 = Color3.fromRGB(0, 0, 0)
+SkinSell.TextScaled = true
+SkinSell.TextSize = 14.000
+SkinSell.TextWrapped = true
+
+AFKSpot.Name = "AFKSpot"
+AFKSpot.Parent = TPFrame
+AFKSpot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+AFKSpot.BorderColor3 = Color3.fromRGB(27, 42, 53)
+AFKSpot.Position = UDim2.new(0.500000179, 0, 0.711858451, 0)
+AFKSpot.Size = UDim2.new(0, 200, 0, 40)
+AFKSpot.Font = Enum.Font.SourceSans
+AFKSpot.Text = "AFK Spot"
+AFKSpot.TextColor3 = Color3.fromRGB(0, 0, 0)
+AFKSpot.TextScaled = true
+AFKSpot.TextSize = 14.000
+AFKSpot.TextWrapped = true
 
 -- Scripts:
 
@@ -429,43 +457,46 @@ CoinBlockHitbox1.MouseButton1Down:connect(function()
 
 end)
 
-CoinBlockHitbox2.MouseButton1Down:connect(function()
-	-- Function to resize the HitBox inside coinBrick
-	local function resizeHitBoxes()
-		-- Get the _CoinBricks folder from the Workspace
-		local coinBricksFolder = game.Workspace:FindFirstChild("_CoinBricks")
+MobTP.MouseButton1Down:connect(function()
+	-- Function to teleport all mobs' HumanoidRootPart to 30 studs in front of the player
+	local function teleportMobsInFrontOfPlayer(player, distance)
+		local character = player.Character
+		if not character then
+			print("Player character not found.")
+			return
+		end
 
-		-- Check if the folder exists
-		if coinBricksFolder then
-			-- Iterate through all children in the _CoinBricks folder
-			for _, coinBrickModel in pairs(coinBricksFolder:GetChildren()) do
-				-- Check if the child is a model
-				if coinBrickModel:IsA("Model") then
-					-- Find the coinBrick part inside the model
-					local coinBrick = coinBrickModel:FindFirstChild("coinBrick")
-					-- Check if coinBrick exists and is a BasePart (e.g., Part)
-					if coinBrick and coinBrick:IsA("BasePart") then
-						-- Find the HitBox part inside the coinBrick
-						local hitBox = coinBrick:FindFirstChild("HitBox")
-						-- Check if hitBox exists and is a BasePart (e.g., Part)
-						if hitBox and hitBox:IsA("BasePart") then
-							-- Change the size of the hitBox to 1000, 1000, 1000
-							hitBox.Size = Vector3.new(5000, 5000, 5000)
-						end
-					end
+		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+		if not humanoidRootPart then
+			print("HumanoidRootPart not found in player character.")
+			return
+		end
+
+		local playerPosition = humanoidRootPart.Position
+		local lookDirection = humanoidRootPart.CFrame.LookVector
+		local targetPosition = playerPosition + (lookDirection * distance)
+
+		for _, mob in pairs(workspace._MOBS:GetChildren()) do
+			if mob:IsA("Model") and mob:FindFirstChild("HumanoidRootPart") then
+				local mobHumanoidRootPart = mob:FindFirstChild("HumanoidRootPart")
+				if mobHumanoidRootPart then
+					-- Teleport the mob's HumanoidRootPart
+					-- Use a higher CFrame override to counteract other scripts
+					mobHumanoidRootPart.CFrame = CFrame.new(targetPosition) * CFrame.Angles(0, math.rad(math.random(360)), 0)
+					print("Teleported " .. mob.Name .. " to " .. tostring(targetPosition))
 				end
 			end
-		else
-			warn("_CoinBricks folder not found in Workspace")
 		end
 	end
 
-	-- Periodically check for new coinBricks and resize their HitBoxes
-	while true do
-		resizeHitBoxes()
-		wait(5) -- Adjust the wait time as needed
-	end
+	-- Main loop to continuously teleport mobs
+	local player = game.Players.LocalPlayer
+	local distance = 30 -- Distance in studs
 
+	while true do
+		teleportMobsInFrontOfPlayer(player, distance)
+		task.wait() -- Increase frequency of teleportation
+	end
 end)
 
 MobEsp.MouseButton1Down:connect(function()
@@ -601,91 +632,53 @@ end)
 
 TPToOmni.MouseButton1Down:connect(function()
 	-- Get the local player
-local player = game.Players.LocalPlayer
+	local player = game.Players.LocalPlayer
 
--- Function to teleport the player to MainMeshPart
-local function teleportToMainMeshPart()
-    local roomsFolder = game.Workspace:FindFirstChild("_ROOMS")
-    
-    if roomsFolder then
-        print("_ROOMS folder found")
-        
-        local omnipotentRoom = roomsFolder:FindFirstChild("OmnipotentRoom")
-        
-        if omnipotentRoom and omnipotentRoom:IsA("Model") then
-            print("OmnipotentRoom found")
-            
-            local mainMeshPart = omnipotentRoom:FindFirstChild("MainMeshPart")
-            
-            if mainMeshPart and mainMeshPart:IsA("BasePart") then
-                print("MainMeshPart found")
-                
-                local character = player.Character or player.CharacterAdded:Wait()
-                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-                
-                if humanoidRootPart then
-                    humanoidRootPart.CFrame = mainMeshPart.CFrame
-                    print("Teleported player to MainMeshPart")
-                    
-                    -- Wait for 1 second before interacting with the prompt
-                    wait(1)
-                    
-                    -- Interact with ProximityPrompt programmatically
-                    local attachment = mainMeshPart:FindFirstChild("Attachment")
-                    if attachment then
-                        local proximityPrompt = attachment:FindFirstChildOfClass("ProximityPrompt")
-                        
-                        if proximityPrompt and proximityPrompt:IsA("ProximityPrompt") then
-                            -- Simulate user interaction
-                            proximityPrompt:Fire()
-                            print("Interacted with ProximityPrompt")
-                        else
-                            warn("ProximityPrompt not found in Attachment")
-                        end
-                    else
-                        warn("Attachment not found in MainMeshPart")
-                    end
-                else
-                    warn("HumanoidRootPart not found in player's character")
-                end
-            else
-                warn("MainMeshPart not found or is not a BasePart in OmnipotentRoom")
-            end
-        else
-            warn("OmnipotentRoom not found or is not a Model in _ROOMS")
-        end
-    else
-        warn("_ROOMS folder not found in Workspace")
-    end
-end
+	-- Function to teleport the player to MainMeshPart
+	local function teleportToMainMeshPart(mainMeshPart)
+		local character = player.Character or player.CharacterAdded:Wait()
+		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
 
--- Function to handle new OmnipotentRoom appearance
-local function onRoomChildAdded(child)
-    if child.Name == "OmnipotentRoom" and child:IsA("Model") then
-        print("OmnipotentRoom added")
-        
-        local mainMeshPart = child:FindFirstChild("MainMeshPart")
-        if mainMeshPart and mainMeshPart:IsA("BasePart") then
-            print("MainMeshPart found in newly added OmnipotentRoom")
-            teleportToMainMeshPart()
-        end
-    end
-end
+		if humanoidRootPart then
+			humanoidRootPart.CFrame = mainMeshPart.CFrame
+			print("Teleported player to MainMeshPart")
+		else
+			warn("HumanoidRootPart not found in player's character")
+		end
+	end
 
--- Connect the ChildAdded event to handle new rooms
-game.Workspace._ROOMS.ChildAdded:Connect(onRoomChildAdded)
+	-- Function to check and teleport if OmnipotentRoom is present
+	local function checkOmnipotentRoom()
+		local roomsFolder = game.Workspace:FindFirstChild("_ROOMS")
 
--- Optionally, check and teleport if OmnipotentRoom is already present
-for _, child in pairs(game.Workspace._ROOMS:GetChildren()) do
-    if child.Name == "OmnipotentRoom" and child:IsA("Model") then
-        print("Checking existing OmnipotentRoom")
-        local mainMeshPart = child:FindFirstChild("MainMeshPart")
-        if mainMeshPart and mainMeshPart:IsA("BasePart") then
-            print("MainMeshPart found in existing OmnipotentRoom")
-            teleportToMainMeshPart()
-        end
-    end
-end
+		if roomsFolder then
+			print("_ROOMS folder found")
+
+			for _, child in pairs(roomsFolder:GetChildren()) do
+				if child.Name == "OmnipotentRoom" and child:IsA("Model") then
+					print("OmnipotentRoom found")
+
+					local mainMeshPart = child:FindFirstChild("MainMeshPart")
+
+					if mainMeshPart and mainMeshPart:IsA("BasePart") then
+						print("MainMeshPart found")
+						teleportToMainMeshPart(mainMeshPart)
+					else
+						warn("MainMeshPart not found or is not a BasePart in OmnipotentRoom")
+					end
+				end
+			end
+		else
+			warn("_ROOMS folder not found in Workspace")
+		end
+	end
+
+	-- Periodically check for OmnipotentRoom every 5 seconds
+	while true do
+		checkOmnipotentRoom()
+		wait(5)
+	end
+
 end)
 
 KingTurtCastle.MouseButton1Down:connect(function()
@@ -717,6 +710,16 @@ StatReset.MouseButton1Down:connect(function()
 
 end)
 
+AFKSpot.MouseButton1Down:connect(function()
+	-- Teleport player to specific coordinates
+	local player = game.Players.LocalPlayer
+	local teleportPosition = Vector3.new(-1128, 221, -1378)
+
+	-- Teleport the player
+	player.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
+
+end)
+
 GunDealer.MouseButton1Down:connect(function()
 	-- Teleport player to specific coordinates
 	local player = game.Players.LocalPlayer
@@ -727,9 +730,10 @@ GunDealer.MouseButton1Down:connect(function()
 
 end)
 
+
 -- Button Scripts:
 
-local function JCBKYKN_fake_script() -- OpenPlayer.OpenScript 
+local function BXYFTT_fake_script() -- OpenPlayer.OpenScript 
 	local script = Instance.new('LocalScript', OpenPlayer)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -741,8 +745,8 @@ local function JCBKYKN_fake_script() -- OpenPlayer.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(JCBKYKN_fake_script)()
-local function GBMHMCI_fake_script() -- MainFrame.Draggable 
+coroutine.wrap(BXYFTT_fake_script)()
+local function XPPG_fake_script() -- MainFrame.Draggable 
 	local script = Instance.new('Script', MainFrame)
 
 	local frame = script.Parent
@@ -752,8 +756,8 @@ local function GBMHMCI_fake_script() -- MainFrame.Draggable
 	
 	
 end
-coroutine.wrap(GBMHMCI_fake_script)()
-local function MPLI_fake_script() -- OpenTP.OpenScript 
+coroutine.wrap(XPPG_fake_script)()
+local function ELQHXD_fake_script() -- OpenTP.OpenScript 
 	local script = Instance.new('LocalScript', OpenTP)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -765,14 +769,14 @@ local function MPLI_fake_script() -- OpenTP.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(MPLI_fake_script)()
-local function EWIOYZ_fake_script() -- InfiniteYield.LocalScript 
+coroutine.wrap(ELQHXD_fake_script)()
+local function ZBBYXH_fake_script() -- InfiniteYield.LocalScript 
 	local script = Instance.new('LocalScript', InfiniteYield)
 
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
 end
-coroutine.wrap(EWIOYZ_fake_script)()
-local function WJJD_fake_script() -- CloseMenu.OpenScript 
+coroutine.wrap(ZBBYXH_fake_script)()
+local function MZJCQL_fake_script() -- CloseMenu.OpenScript 
 	local script = Instance.new('LocalScript', CloseMenu)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -780,8 +784,8 @@ local function WJJD_fake_script() -- CloseMenu.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(WJJD_fake_script)()
-local function ZXLMIRF_fake_script() -- HideMenu.OpenScript 
+coroutine.wrap(MZJCQL_fake_script)()
+local function EJCGY_fake_script() -- HideMenu.OpenScript 
 	local script = Instance.new('LocalScript', HideMenu)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -793,8 +797,8 @@ local function ZXLMIRF_fake_script() -- HideMenu.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(ZXLMIRF_fake_script)()
-local function IBCARX_fake_script() -- OpenUniversal.OpenScript 
+coroutine.wrap(EJCGY_fake_script)()
+local function EFTZ_fake_script() -- OpenUniversal.OpenScript 
 	local script = Instance.new('LocalScript', OpenUniversal)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -806,8 +810,8 @@ local function IBCARX_fake_script() -- OpenUniversal.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(IBCARX_fake_script)()
-local function XXVHJJK_fake_script() -- OpenWorld.OpenScript 
+coroutine.wrap(EFTZ_fake_script)()
+local function OUGDR_fake_script() -- OpenWorld.OpenScript 
 	local script = Instance.new('LocalScript', OpenWorld)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -819,4 +823,4 @@ local function XXVHJJK_fake_script() -- OpenWorld.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(XXVHJJK_fake_script)()
+coroutine.wrap(OUGDR_fake_script)()
