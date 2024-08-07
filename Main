@@ -20,7 +20,7 @@ elseif game.PlaceId == BGS then
  print ('You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640')
  
  elseif game.PlaceId == MPS then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Mushroom.lua'))()  
+  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Mushroom%20Plumber%20Simulator.lua'))()  
    print ('You Have Loaded MPS Menu')
 
 end
