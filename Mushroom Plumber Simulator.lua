@@ -601,53 +601,91 @@ end)
 
 TPToOmni.MouseButton1Down:connect(function()
 	-- Get the local player
-	local player = game.Players.LocalPlayer
+local player = game.Players.LocalPlayer
 
-	-- Function to teleport the player to MainMeshPart
-	local function teleportToMainMeshPart(mainMeshPart)
-		local character = player.Character or player.CharacterAdded:Wait()
-		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+-- Function to teleport the player to MainMeshPart
+local function teleportToMainMeshPart()
+    local roomsFolder = game.Workspace:FindFirstChild("_ROOMS")
+    
+    if roomsFolder then
+        print("_ROOMS folder found")
+        
+        local omnipotentRoom = roomsFolder:FindFirstChild("OmnipotentRoom")
+        
+        if omnipotentRoom and omnipotentRoom:IsA("Model") then
+            print("OmnipotentRoom found")
+            
+            local mainMeshPart = omnipotentRoom:FindFirstChild("MainMeshPart")
+            
+            if mainMeshPart and mainMeshPart:IsA("BasePart") then
+                print("MainMeshPart found")
+                
+                local character = player.Character or player.CharacterAdded:Wait()
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                
+                if humanoidRootPart then
+                    humanoidRootPart.CFrame = mainMeshPart.CFrame
+                    print("Teleported player to MainMeshPart")
+                    
+                    -- Wait for 1 second before interacting with the prompt
+                    wait(1)
+                    
+                    -- Interact with ProximityPrompt programmatically
+                    local attachment = mainMeshPart:FindFirstChild("Attachment")
+                    if attachment then
+                        local proximityPrompt = attachment:FindFirstChildOfClass("ProximityPrompt")
+                        
+                        if proximityPrompt and proximityPrompt:IsA("ProximityPrompt") then
+                            -- Simulate user interaction
+                            proximityPrompt:Fire()
+                            print("Interacted with ProximityPrompt")
+                        else
+                            warn("ProximityPrompt not found in Attachment")
+                        end
+                    else
+                        warn("Attachment not found in MainMeshPart")
+                    end
+                else
+                    warn("HumanoidRootPart not found in player's character")
+                end
+            else
+                warn("MainMeshPart not found or is not a BasePart in OmnipotentRoom")
+            end
+        else
+            warn("OmnipotentRoom not found or is not a Model in _ROOMS")
+        end
+    else
+        warn("_ROOMS folder not found in Workspace")
+    end
+end
 
-		if humanoidRootPart then
-			humanoidRootPart.CFrame = mainMeshPart.CFrame
-			print("Teleported player to MainMeshPart")
-		else
-			warn("HumanoidRootPart not found in player's character")
-		end
-	end
+-- Function to handle new OmnipotentRoom appearance
+local function onRoomChildAdded(child)
+    if child.Name == "OmnipotentRoom" and child:IsA("Model") then
+        print("OmnipotentRoom added")
+        
+        local mainMeshPart = child:FindFirstChild("MainMeshPart")
+        if mainMeshPart and mainMeshPart:IsA("BasePart") then
+            print("MainMeshPart found in newly added OmnipotentRoom")
+            teleportToMainMeshPart()
+        end
+    end
+end
 
-	-- Function to check and teleport if OmnipotentRoom is present
-	local function checkOmnipotentRoom()
-		local roomsFolder = game.Workspace:FindFirstChild("_ROOMS")
+-- Connect the ChildAdded event to handle new rooms
+game.Workspace._ROOMS.ChildAdded:Connect(onRoomChildAdded)
 
-		if roomsFolder then
-			print("_ROOMS folder found")
-
-			for _, child in pairs(roomsFolder:GetChildren()) do
-				if child.Name == "OmnipotentRoom" and child:IsA("Model") then
-					print("OmnipotentRoom found")
-
-					local mainMeshPart = child:FindFirstChild("MainMeshPart")
-
-					if mainMeshPart and mainMeshPart:IsA("BasePart") then
-						print("MainMeshPart found")
-						teleportToMainMeshPart(mainMeshPart)
-					else
-						warn("MainMeshPart not found or is not a BasePart in OmnipotentRoom")
-					end
-				end
-			end
-		else
-			warn("_ROOMS folder not found in Workspace")
-		end
-	end
-
-	-- Periodically check for OmnipotentRoom every 5 seconds
-	while true do
-		checkOmnipotentRoom()
-		wait(5)
-	end
-
+-- Optionally, check and teleport if OmnipotentRoom is already present
+for _, child in pairs(game.Workspace._ROOMS:GetChildren()) do
+    if child.Name == "OmnipotentRoom" and child:IsA("Model") then
+        print("Checking existing OmnipotentRoom")
+        local mainMeshPart = child:FindFirstChild("MainMeshPart")
+        if mainMeshPart and mainMeshPart:IsA("BasePart") then
+            print("MainMeshPart found in existing OmnipotentRoom")
+            teleportToMainMeshPart()
+        end
+    end
+end
 end)
 
 KingTurtCastle.MouseButton1Down:connect(function()
