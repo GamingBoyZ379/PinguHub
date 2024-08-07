@@ -2,9 +2,9 @@ local BloodMoonTycoon = 961409234
 local BreakInStory = 4620170611
 local BreakInStoryLobby = 3851622790
 local BGS = 2512643572
-local ProjectSlayers = 5956785391
-local ProjectSlayersMap = 6152116144
+local MPS = 15975797635
 local game6 = 1234567
+
 
 if game.PlaceId == BloodMoonTycoon then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua'))()  
@@ -19,14 +19,8 @@ elseif game.PlaceId == BGS then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua'))()  
  print ('You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640')
  
- elseif game.PlaceId == ProjectSlayers then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/ProjectSlayers.lua'))()  
-   print ('You Have Loaded Project Slayers Menu')
- 
- elseif game.PlaceId == ProjectSlayersMap then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/ProjectSlayers.lua'))()  
-   print ('You Have Loaded Project Slayers Map')
-
-
+ elseif game.PlaceId == MPS then
+  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Mushroom.lua'))()  
+   print ('You Have Loaded MPS Menu')
 
 end
