@@ -1,5 +1,6 @@
 # PinguHub
 This Is My First GUI Hub
+I have minimal knowledge in lua and other languages
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Main"))()
@@ -16,5 +17,3 @@ Bubble Gum Simulator - https://www.roblox.com/games/2512643572/EGG-HUNT-Bubble-G
 ~~Project Slayers - https://www.roblox.com/games/5956785391/RELEASE-Project-Slayers~~
 
 Mushroom Plumber Simulator - https://www.roblox.com/games/15975797635/Mushroom-Plumber-Simulator
-
-I have minimal knowledge in lua and other languages
