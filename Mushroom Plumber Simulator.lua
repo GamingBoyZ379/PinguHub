@@ -785,7 +785,6 @@ local function ELQHXD_fake_script() -- OpenTP.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(MZJCQL_fake_script)()
 local function EJCGY_fake_script() -- HideMenu.OpenScript 
 	local script = Instance.new('LocalScript', HideMenu)
 
