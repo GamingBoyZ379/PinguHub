@@ -155,7 +155,7 @@ CoinBlockHitbox1.BorderColor3 = Color3.fromRGB(27, 42, 53)
 CoinBlockHitbox1.Position = UDim2.new(0, 0, 0.0118584773, 0)
 CoinBlockHitbox1.Size = UDim2.new(0, 200, 0, 40)
 CoinBlockHitbox1.Font = Enum.Font.SourceSans
-CoinBlockHitbox1.Text = "Touch Coin Blocks"
+CoinBlockHitbox1.Text = "Touch Coin"
 CoinBlockHitbox1.TextColor3 = Color3.fromRGB(0, 0, 0)
 CoinBlockHitbox1.TextScaled = true
 CoinBlockHitbox1.TextSize = 14.000
@@ -678,7 +678,8 @@ end)
 KingTurtCastle.MouseButton1Down:connect(function()
 	-- Teleport player to specific coordinates
 	local player = game.Players.LocalPlayer
-	local teleportPosition = Vector3.new(-1118, 161, -1523) 
+	local teleportPosition = Vector3.new(-1118, 161, -1523)
+
 	-- Teleport the player
 	player.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
 end)
@@ -740,7 +741,7 @@ end)
 SkinSell.MouseButton1Down:connect(function()
 	-- Teleport player to specific coordinates
 	local player = game.Players.LocalPlayer
-	local teleportPosition = Vector3.new(-225, 137, -1766)
+	local teleportPosition = Vector3.new(-819, 137, -1055)
 
 	-- Teleport the player
 	player.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
@@ -785,6 +786,22 @@ local function ELQHXD_fake_script() -- OpenTP.OpenScript
 		wait(0.1)
 	end)
 end
+coroutine.wrap(ELQHXD_fake_script)()
+local function ZBBYXH_fake_script() -- InfiniteYield.LocalScript 
+	local script = Instance.new('LocalScript', InfiniteYield)
+
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end
+coroutine.wrap(ZBBYXH_fake_script)()
+local function MZJCQL_fake_script() -- CloseMenu.OpenScript 
+	local script = Instance.new('LocalScript', CloseMenu)
+
+	script.Parent.MouseButton1Click:connect(function()
+		script.Parent.Parent.Parent.Enabled = false
+		wait(0.1)
+	end)
+end
+coroutine.wrap(MZJCQL_fake_script)()
 local function EJCGY_fake_script() -- HideMenu.OpenScript 
 	local script = Instance.new('LocalScript', HideMenu)
 
