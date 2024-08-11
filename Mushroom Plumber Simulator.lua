@@ -155,7 +155,7 @@ CoinBlockHitbox1.BorderColor3 = Color3.fromRGB(27, 42, 53)
 CoinBlockHitbox1.Position = UDim2.new(0, 0, 0.0118584773, 0)
 CoinBlockHitbox1.Size = UDim2.new(0, 200, 0, 40)
 CoinBlockHitbox1.Font = Enum.Font.SourceSans
-CoinBlockHitbox1.Text = "Coin Block Hitbox"
+CoinBlockHitbox1.Text = "Touch Coin Blocks"
 CoinBlockHitbox1.TextColor3 = Color3.fromRGB(0, 0, 0)
 CoinBlockHitbox1.TextScaled = true
 CoinBlockHitbox1.TextSize = 14.000
@@ -207,7 +207,7 @@ MobTP.BorderColor3 = Color3.fromRGB(27, 42, 53)
 MobTP.Position = UDim2.new(0.500000179, 0, 0.369001329, 0)
 MobTP.Size = UDim2.new(0, 200, 0, 40)
 MobTP.Font = Enum.Font.SourceSans
-MobTP.Text = "BIG Coin Block Hitbox"
+MobTP.Text = "TP Mobs"
 MobTP.TextColor3 = Color3.fromRGB(0, 0, 0)
 MobTP.TextScaled = true
 MobTP.TextSize = 14.000
@@ -419,40 +419,34 @@ TPDrops.MouseButton1Down:connect(function()
 end)
 
 CoinBlockHitbox1.MouseButton1Down:connect(function()
-	-- Function to resize the HitBox inside coinBrick
-	local function resizeHitBoxes()
-		-- Get the _CoinBricks folder from the Workspace
-		local coinBricksFolder = game.Workspace:FindFirstChild("_CoinBricks")
+	-- Function to fire TouchInterest
+	local function fireTouchInterest(touchInterest)
+		if firetouchinterest then
+			-- Simulate a touch event between the Hitbox part and the player's character
+			firetouchinterest(touchInterest.Parent, game.Players.LocalPlayer.Character.PrimaryPart, 0)
+			firetouchinterest(touchInterest.Parent, game.Players.LocalPlayer.Character.PrimaryPart, 1)
+		end
+	end
 
-		-- Check if the folder exists
-		if coinBricksFolder then
-			-- Iterate through all children in the _CoinBricks folder
-			for _, coinBrickModel in pairs(coinBricksFolder:GetChildren()) do
-				-- Check if the child is a model
-				if coinBrickModel:IsA("Model") then
-					-- Find the coinBrick part inside the model
-					local coinBrick = coinBrickModel:FindFirstChild("coinBrick")
-					-- Check if coinBrick exists and is a BasePart (e.g., Part)
-					if coinBrick and coinBrick:IsA("BasePart") then
-						-- Find the HitBox part inside the coinBrick
-						local hitBox = coinBrick:FindFirstChild("HitBox")
-						-- Check if hitBox exists and is a BasePart (e.g., Part)
-						if hitBox and hitBox:IsA("BasePart") then
-							-- Change the size of the hitBox to 1000, 1000, 1000
-							hitBox.Size = Vector3.new(1000, 1000, 1000)
+	-- Main loop to continuously fire TouchInterests
+	while true do
+		for _, coinBrickModel in pairs(workspace._CoinBricks:GetChildren()) do
+			if coinBrickModel:IsA("Model") then
+				local coinBrick = coinBrickModel:FindFirstChild("coinBrick")
+				if coinBrick then
+					local hitBox = coinBrick:FindFirstChild("HitBox")
+					if hitBox then
+						local touchInterest = hitBox:FindFirstChild("TouchInterest")
+						if touchInterest then
+							fireTouchInterest(touchInterest)
 						end
 					end
 				end
 			end
-		else
-			warn("_CoinBricks folder not found in Workspace")
 		end
-	end
 
-	-- Periodically check for new coinBricks and resize their HitBoxes
-	while true do
-		resizeHitBoxes()
-		wait(5) -- Adjust the wait time as needed
+		-- Wait for a short period before checking again
+		task.wait()
 	end
 
 end)
