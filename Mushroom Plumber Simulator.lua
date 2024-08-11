@@ -785,21 +785,6 @@ local function ELQHXD_fake_script() -- OpenTP.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(ELQHXD_fake_script)()
-local function ZBBYXH_fake_script() -- InfiniteYield.LocalScript 
-	local script = Instance.new('LocalScript', InfiniteYield)
-
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-end
-coroutine.wrap(ZBBYXH_fake_script)()
-local function MZJCQL_fake_script() -- CloseMenu.OpenScript 
-	local script = Instance.new('LocalScript', CloseMenu)
-
-	script.Parent.MouseButton1Click:connect(function()
-		script.Parent.Parent.Parent.Enabled = false
-		wait(0.1)
-	end)
-end
 coroutine.wrap(MZJCQL_fake_script)()
 local function EJCGY_fake_script() -- HideMenu.OpenScript 
 	local script = Instance.new('LocalScript', HideMenu)
