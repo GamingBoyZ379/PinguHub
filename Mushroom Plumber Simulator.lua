@@ -388,6 +388,23 @@ TPDrops.MouseButton1Down:connect(function()
 	-- Get the local player
 	local player = game.Players.LocalPlayer
 
+	-- Function to remove all particle emitters from a drop
+	local function removeParticles(drop)
+		-- Remove particle emitters directly under the drop
+		for _, child in pairs(drop:GetChildren()) do
+			if child:IsA("ParticleEmitter") then
+				child:Destroy()
+			elseif child:IsA("Attachment") then
+				-- Remove particle emitters inside attachments
+				for _, attachmentChild in pairs(child:GetChildren()) do
+					if attachmentChild:IsA("ParticleEmitter") then
+						attachmentChild:Destroy()
+					end
+				end
+			end
+		end
+	end
+
 	-- Function to teleport and disable collision for drops
 	local function collectDrops()
 		-- Get the _ITEMDROPS_STORAGE folder from the Workspace
@@ -406,6 +423,9 @@ TPDrops.MouseButton1Down:connect(function()
 				for _, drop in pairs(itemsDropFolder:GetChildren()) do
 					if drop:IsA("MeshPart") then
 						local collected = false
+
+						-- Remove particles from the drop
+						removeParticles(drop)
 
 						-- Iterate through all nameTag instances within the drop
 						for _, nameTag in pairs(drop:GetChildren()) do
@@ -442,7 +462,7 @@ TPDrops.MouseButton1Down:connect(function()
 
 	-- Continuously check and collect new drops (e.g., every 5 seconds)
 	while true do
-		wait(1)
+		task.wait()
 		collectDrops()
 	end
 end)
