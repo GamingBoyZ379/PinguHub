@@ -740,7 +740,7 @@ end)
 SkinSell.MouseButton1Down:connect(function()
 	-- Teleport player to specific coordinates
 	local player = game.Players.LocalPlayer
-	local teleportPosition = Vector3.new(-819, 137, -1055)
+	local teleportPosition = Vector3.new-225, 137, -1766)
 
 	-- Teleport the player
 	player.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
