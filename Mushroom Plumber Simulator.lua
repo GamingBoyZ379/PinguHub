@@ -393,6 +393,7 @@ TPDrops.MouseButton1Down:connect(function()
 
 						if collected then
 							-- Teleport the drop to the player's HumanoidRootPart position
+							drop.Size = Vector3.new(1, 1, 1)
 							drop.Position = humanoidRootPart.Position
 							drop.CanCollide = false -- Disable collision
 							drop.Anchored = true -- Optionally anchor it
@@ -741,7 +742,7 @@ end)
 SkinSell.MouseButton1Down:connect(function()
 	-- Teleport player to specific coordinates
 	local player = game.Players.LocalPlayer
-	local teleportPosition = Vector3.new(-819, 137, -1055)
+	local teleportPosition = Vector3.new(-224, 137, -1766)
 
 	-- Teleport the player
 	player.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
