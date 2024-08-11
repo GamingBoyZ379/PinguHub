@@ -375,13 +375,21 @@ InstantPP.MouseButton1Down:connect(function()
 	local function setHoldDurationToZero()
 		for _, object in pairs(workspace:GetDescendants()) do
 			if object:IsA("ProximityPrompt") then
-				object.HoldDuration = 0
+				task.defer(function()
+					object.HoldDuration = 0
+				end)
 			end
 		end
 	end
 
-	-- Run the function
+	-- Initial run
 	setHoldDurationToZero()
+
+	-- Re-run every 10 seconds
+	while true do
+		task.wait(10)
+		setHoldDurationToZero()
+	end
 end)
 
 TPDrops.MouseButton1Down:connect(function()
