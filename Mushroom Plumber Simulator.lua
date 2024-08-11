@@ -11,6 +11,7 @@ local UICorner = Instance.new("UICorner")
 local OpenTP = Instance.new("TextButton")
 local UniversalFrame = Instance.new("Frame")
 local InfiniteYield = Instance.new("TextButton")
+local InstantPP = Instance.new("TextButton")
 local CloseMenu = Instance.new("TextButton")
 local PlayerFrame = Instance.new("Frame")
 local InfiniteStamina = Instance.new("TextButton")
@@ -98,14 +99,27 @@ InfiniteYield.Name = "InfiniteYield"
 InfiniteYield.Parent = UniversalFrame
 InfiniteYield.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 InfiniteYield.BorderColor3 = Color3.fromRGB(27, 42, 53)
-InfiniteYield.Position = UDim2.new(0.352499992, 0, 0.00714285718, 0)
-InfiniteYield.Size = UDim2.new(0, 119, 0, 20)
+InfiniteYield.Position = UDim2.new(0.597500145, 0, 0.00714285718, 0)
+InfiniteYield.Size = UDim2.new(0, 160, 0, 30)
 InfiniteYield.Font = Enum.Font.SourceSans
 InfiniteYield.Text = "Infinite Yield"
 InfiniteYield.TextColor3 = Color3.fromRGB(0, 0, 0)
 InfiniteYield.TextScaled = true
 InfiniteYield.TextSize = 14.000
 InfiniteYield.TextWrapped = true
+
+InstantPP.Name = "InstantPP"
+InstantPP.Parent = UniversalFrame
+InstantPP.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+InstantPP.BorderColor3 = Color3.fromRGB(27, 42, 53)
+InstantPP.Position = UDim2.new(0, 0, 0.0118584773, 0)
+InstantPP.Size = UDim2.new(0, 160, 0, 30)
+InstantPP.Font = Enum.Font.SourceSans
+InstantPP.Text = "Instant Proximity Prompt"
+InstantPP.TextColor3 = Color3.fromRGB(0, 0, 0)
+InstantPP.TextScaled = true
+InstantPP.TextSize = 14.000
+InstantPP.TextWrapped = true
 
 CloseMenu.Name = "CloseMenu"
 CloseMenu.Parent = MainFrame
@@ -354,6 +368,20 @@ AFKSpot.TextWrapped = true
 
 InfiniteYield.MouseButton1Down:connect(function()
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end)
+
+InstantPP.MouseButton1Down:connect(function()
+	-- Function to set HoldDuration property of ProximityPrompt to 0
+	local function setHoldDurationToZero()
+		for _, object in pairs(workspace:GetDescendants()) do
+			if object:IsA("ProximityPrompt") then
+				object.HoldDuration = 0
+			end
+		end
+	end
+
+	-- Run the function
+	setHoldDurationToZero()
 end)
 
 TPDrops.MouseButton1Down:connect(function()
