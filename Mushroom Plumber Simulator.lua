@@ -678,8 +678,7 @@ end)
 KingTurtCastle.MouseButton1Down:connect(function()
 	-- Teleport player to specific coordinates
 	local player = game.Players.LocalPlayer
-	local teleportPosition = Vector3.new(-1118, 161, -1523)
-
+	local teleportPosition = Vector3.new(-1118, 161, -1523) 
 	-- Teleport the player
 	player.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
 end)
@@ -705,9 +704,23 @@ StatReset.MouseButton1Down:connect(function()
 end)
 
 AFKSpot.MouseButton1Down:connect(function()
+	-- Create a new part
+	local part = Instance.new("Part")
+
+	-- Set the part's properties
+	part.Size = Vector3.new(100, 5, 100)
+	part.Position = Vector3.new(-1074, -49, -1385)
+	part.Anchored = true -- Make sure the part does not fall
+	part.BrickColor = BrickColor.new("Bright blue") -- Optional: set color for visibility
+
+	-- Parent the part to Workspace to make it appear in the game
+	part.Parent = workspace
+
+	wait(5)
+
 	-- Teleport player to specific coordinates
 	local player = game.Players.LocalPlayer
-	local teleportPosition = Vector3.new(-1128, 221, -1378)
+	local teleportPosition = Vector3.new(-1074, -48, -1385)
 
 	-- Teleport the player
 	player.Character.HumanoidRootPart.CFrame = CFrame.new(teleportPosition)
