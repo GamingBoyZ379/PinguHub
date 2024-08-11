@@ -716,7 +716,7 @@ AFKSpot.MouseButton1Down:connect(function()
 	-- Parent the part to Workspace to make it appear in the game
 	part.Parent = workspace
 
-	wait(5)
+	wait()
 
 	-- Teleport player to specific coordinates
 	local player = game.Players.LocalPlayer
