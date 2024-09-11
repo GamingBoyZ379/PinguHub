@@ -1,26 +1,20 @@
-local BloodMoonTycoon = 961409234
-local BreakInStory = 4620170611
-local BreakInStoryLobby = 3851622790
-local BGS = 2512643572
-local MPS = 15975797635
-local game6 = 1234567
+local PlaceScripts = {
+    [961409234] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua',  -- BloodMoonTycoon
+    [4620170611] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Break%20In%20(Story)%20GUI.lua',  -- BreakInStory
+    [2512643572] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua',  -- BubbleGumSimulator
+    [15975797635] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Mushroom%20Plumber%20Simulator.lua'  -- MushroomPlumberSimulator
+    [395515963] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/TFT%20GUI.lua' -- TixFactoryTycoon
+}
 
+local messages = {
+    [4620170611] = nil, -- No message for BreakInStory
+    [2512643572] = 'You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640', -- BubbleGumSimulator
+    [15975797635] = 'You Have Loaded MPS Menu' -- MushroomPlumberSimulator
+    [3851622790] = 'You Must Load Into An Actual Round Before Loading Break In (Story) GUI' -- BreakInStoryLobby
+}
 
-if game.PlaceId == BloodMoonTycoon then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua'))()  
-  
-elseif game.PlaceId == BreakInStory then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Break%20In%20(Story)%20GUI.lua'))()
-
-elseif game.PlaceId == BreakInStoryLobby then
- print ('You Must Load Into An Actual Round Before Loading Break In (Story) GUI')
-
-elseif game.PlaceId == BGS then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua'))()  
- print ('You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640')
- 
- elseif game.PlaceId == MPS then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Mushroom%20Plumber%20Simulator.lua'))()  
-   print ('You Have Loaded MPS Menu')
-
-end
+if PlaceScripts[game.PlaceId] then
+    loadstring(game:HttpGet(PlaceScripts[game.PlaceId]))()
+    if messages[game.PlaceId] then
+        print(messages[game.PlaceId])
+    end
