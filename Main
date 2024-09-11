@@ -2,14 +2,14 @@ local PlaceScripts = {
     [961409234] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BMT%20GUI.lua',  -- BloodMoonTycoon
     [4620170611] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Break%20In%20(Story)%20GUI.lua',  -- BreakInStory
     [2512643572] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua',  -- BubbleGumSimulator
-    [15975797635] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Mushroom%20Plumber%20Simulator.lua'  -- MushroomPlumberSimulator
+    [15975797635] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Mushroom%20Plumber%20Simulator.lua',  -- MushroomPlumberSimulator
     [395515963] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/TFT%20GUI.lua' -- TixFactoryTycoon
 }
 
 local messages = {
     [4620170611] = nil, -- No message for BreakInStory
     [2512643572] = 'You Have Loaded BGS GUI Made By Ayano#0002 And It Was Then Adopted And Updated By Dinero#9673 And fadud#2640', -- BubbleGumSimulator
-    [15975797635] = 'You Have Loaded MPS Menu' -- MushroomPlumberSimulator
+    [15975797635] = 'You Have Loaded MPS Menu', -- MushroomPlumberSimulator
     [3851622790] = 'You Must Load Into An Actual Round Before Loading Break In (Story) GUI' -- BreakInStoryLobby
 }
 
@@ -18,3 +18,4 @@ if PlaceScripts[game.PlaceId] then
     if messages[game.PlaceId] then
         print(messages[game.PlaceId])
     end
+end
