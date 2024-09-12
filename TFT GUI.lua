@@ -561,107 +561,129 @@ TreeFarm.MouseButton1Down:connect(function()
 end)
 
 DeleteHazards.MouseButton1Down:connect(function()
-	-- Function to delete all parts in the specified folder
-	local function deleteAllParts(folder)
-		if not folder then return end
+-- Function to delete all parts in the specified folder
+local function deleteAllParts(folder)
+    if not folder then return end
 
-		for _, obj in pairs(folder:GetDescendants()) do
-			if obj:IsA("Part") then
-				obj:Destroy()
-			end
-		end
-	end
+    for _, obj in pairs(folder:GetDescendants()) do
+        if obj:IsA("Part") then
+            obj:Destroy()
+        end
+    end
+end
 
-	-- Function to delete all children in the specified folder
-	local function deleteAllChildren(folder)
-		if not folder then return end
+-- Function to delete all children in the specified folder
+local function deleteAllChildren(folder)
+    if not folder then return end
 
-		for _, child in pairs(folder:GetChildren()) do
-			child:Destroy()
-		end
-	end
+    for _, child in pairs(folder:GetChildren()) do
+        child:Destroy()
+    end
+end
 
-	-- Specify the folder to clear parts in GifIn
-	local gifInFolder = workspace:FindFirstChild("Camera")
-		and workspace.Camera:FindFirstChild("Lokaal")
-		and workspace.Camera.Lokaal:FindFirstChild("Effecten")
-		and workspace.Camera.Lokaal.Effecten:FindFirstChild("GifIn")
+-- Specify the folder to clear parts in GifIn
+local gifInFolder = workspace:FindFirstChild("Camera")
+                        and workspace.Camera:FindFirstChild("Lokaal")
+                        and workspace.Camera.Lokaal:FindFirstChild("Effecten")
+                        and workspace.Camera.Lokaal.Effecten:FindFirstChild("GifIn")
 
-	-- Specify the folder to clear children in ZiekIn
-	local ziekInFolder = workspace:FindFirstChild("Camera")
-		and workspace.Camera:FindFirstChild("Lokaal")
-		and workspace.Camera.Lokaal:FindFirstChild("Effecten")
-		and workspace.Camera.Lokaal.Effecten:FindFirstChild("ZiekIn")
+-- Specify the folder to clear children in ZiekIn
+local ziekInFolder = workspace:FindFirstChild("Camera")
+                        and workspace.Camera:FindFirstChild("Lokaal")
+                        and workspace.Camera.Lokaal:FindFirstChild("Effecten")
+                        and workspace.Camera.Lokaal.Effecten:FindFirstChild("ZiekIn")
 
-	-- Specify the Lava folder to clear
-	local lavaFolder = workspace:FindFirstChild("Game") and workspace.Game:FindFirstChild("Lava")
+-- Specify the Lava folder to clear
+local lavaFolder = workspace:FindFirstChild("Game") and workspace.Game:FindFirstChild("Lava")
 
-	-- Call the functions to delete all parts and children
-	deleteAllParts(gifInFolder)
+-- Specify the Guis folder to clear
+local guisFolder = workspace:FindFirstChild("Game") and workspace.Game:FindFirstChild("Guis")
 
-	if lavaFolder then
-		deleteAllChildren(lavaFolder)
-	else
-		warn("workspace.Game.Lava folder not found.")
-	end
+-- Specify the GameSlotje folder to clear
+local gameSlotjeFolder = workspace:FindFirstChild("GameSlotje")
 
-	-- Delete all children in ZiekIn folder
-	deleteAllChildren(ziekInFolder)
+-- Call the functions to delete all parts and children
+deleteAllParts(gifInFolder)
+
+if lavaFolder then
+    deleteAllChildren(lavaFolder)
+else
+    warn("workspace.Game.Lava folder not found.")
+end
+
+-- Delete all children in ZiekIn folder
+deleteAllChildren(ziekInFolder)
+
+-- Delete all children in Guis folder
+if guisFolder then
+    deleteAllChildren(guisFolder)
+else
+    warn("workspace.Game.Guis folder not found.")
+end
+
+-- Delete all children in GameSlotje folder
+if gameSlotjeFolder then
+    deleteAllChildren(gameSlotjeFolder)
+else
+    warn("workspace.GameSlotje folder not found.")
+end
 
 end)
 
 TPTix.MouseButton1Down:connect(function()
 	-- Function to fire all TouchInterests and optionally disable collisions
-	local function processTouchInterests(folder)
-		if not folder then return end
+local function processTouchInterests(folder)
+	if not folder then return end
 
-		for _, obj in pairs(folder:GetDescendants()) do
-			if obj:IsA("Part") then
-				local touchInterest = obj:FindFirstChild("TouchInterest")
-				if touchInterest then
-					-- Fire the TouchInterest twice to simulate a touch event
-					local characterPrimaryPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.PrimaryPart
-					if characterPrimaryPart then
-						firetouchinterest(obj, characterPrimaryPart, 0)
-						firetouchinterest(obj, characterPrimaryPart, 1)
-					end
-
-					-- Disable collision for the part
-					obj.CanCollide = false
+	for _, obj in pairs(folder:GetDescendants()) do
+		if obj:IsA("Part") then
+			local touchInterest = obj:FindFirstChild("TouchInterest")
+			if touchInterest then
+				-- Fire the TouchInterest twice to simulate a touch event
+				local characterPrimaryPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.PrimaryPart
+				if characterPrimaryPart then
+					firetouchinterest(obj, characterPrimaryPart, 0)
+					firetouchinterest(obj, characterPrimaryPart, 1)
 				end
+
+				-- Disable collision for the part
+				obj.CanCollide = false
 			end
 		end
 	end
+end
 
-	-- Process specified folders
-	local function processFolders()
-		local gameFolder = workspace:FindFirstChild("Game")
-		if not gameFolder then return end
+-- Process specified folders
+local function processFolders()
+	local gameFolder = workspace:FindFirstChild("Game")
+	if not gameFolder then return end
 
-		local eventsFolder = gameFolder:FindFirstChild("Events")
-		local oresFolder = gameFolder:FindFirstChild("Ores")
-		local lavaTixFolder = oresFolder and oresFolder:FindFirstChild("LavaTix")
-		local forgotPieceFolder = oresFolder and oresFolder:FindFirstChild("Forgot_Piece")
-		local uraniumTixFolder = oresFolder and oresFolder:FindFirstChild("UraniumTix")
-		local goldPieceFolder = oresFolder and oresFolder:FindFirstChild("Gold_Piece")
+	local eventsFolder = gameFolder:FindFirstChild("Events")
+	local oresFolder = gameFolder:FindFirstChild("Ores")
+	local lavaTixFolder = oresFolder and oresFolder:FindFirstChild("LavaTix")
+	local forgotPieceFolder = oresFolder and oresFolder:FindFirstChild("Forgot_Piece")
+	local uraniumTixFolder = oresFolder and oresFolder:FindFirstChild("UraniumTix")
+	local goldPieceFolder = oresFolder and oresFolder:FindFirstChild("Gold_Piece")
+                local rainbow6Folder = eventsFolder and eventsFolder:FindFirstChild("Default") and eventsFolder.Default:FindFirstChild("Rainbow6") and eventsFolder.Default.Rainbow6:FindFirstChild("Reward")
 
-		processTouchInterests(eventsFolder)
-		processTouchInterests(lavaTixFolder)
-		processTouchInterests(forgotPieceFolder)
-		processTouchInterests(uraniumTixFolder)
-		processTouchInterests(goldPieceFolder)
-	end
+	processTouchInterests(eventsFolder)
+	processTouchInterests(lavaTixFolder)
+	processTouchInterests(forgotPieceFolder)
+	processTouchInterests(uraniumTixFolder)
+	processTouchInterests(goldPieceFolder)
+	processTouchInterests(rainbow6Folder)
+end
 
-	-- Initial call to process existing TouchInterests
+-- Initial call to process existing TouchInterests
+processFolders()
+
+-- Continuously check and process TouchInterests every 10 seconds
+while true do
+	task.wait()  -- Adjust the wait time as needed
 	processFolders()
+end
 
-	-- Continuously check and process TouchInterests every 10 seconds
-	while true do
-		task.wait()  -- Adjust the wait time as needed
-		processFolders()
-	end
-
-end)
+	end)
 
 InfiniteYield.MouseButton1Down:connect(function()
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
