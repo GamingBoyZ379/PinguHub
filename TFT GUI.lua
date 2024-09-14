@@ -34,7 +34,7 @@ local AutoTixium = Instance.new("TextButton")
 --Properties:
 
 PinguHub_TixFactoryTycoon.Name = "PinguHub_TixFactoryTycoon"
-PinguHub_TixFactoryTycoon.Parent = game:GetService(CoreGUI)
+PinguHub_TixFactoryTycoon.Parent = game:GetService("CoreGUI")
 PinguHub_TixFactoryTycoon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 MainFrame.Name = "MainFrame"
