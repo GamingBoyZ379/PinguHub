@@ -34,7 +34,7 @@ local AutoTixium = Instance.new("TextButton")
 --Properties:
 
 PinguHub_TixFactoryTycoon.Name = "PinguHub_TixFactoryTycoon"
-PinguHub_TixFactoryTycoon.Parent = game:GetService("CoreGUI")
+PinguHub_TixFactoryTycoon.Parent = game:GetService("CoreGui")
 PinguHub_TixFactoryTycoon.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 MainFrame.Name = "MainFrame"
@@ -972,7 +972,7 @@ AddLeaderstats.MouseButton1Down:connect(function()
 		task.wait()
 		updateAllPlayerLeaderstats()
 	end
-	
+
 end)
 
 AutoTixium.MouseButton1Down:connect(function()
@@ -1128,8 +1128,8 @@ local function CDMHL_fake_script() -- MainFrame.Draggable
 	frame.Active = true
 	frame.Selectable = true
 	frame.Draggable = true
-	
-	
+
+
 end
 coroutine.wrap(CDMHL_fake_script)()
 local function YYVU_fake_script() -- OpenAutofarms.OpenScript 
