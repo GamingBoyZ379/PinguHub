@@ -322,72 +322,93 @@ FakeResearch.MouseButton1Down:connect(function()
 end)
 
 AutoPacket.MouseButton1Down:connect(function()
-	-- Get the local player
-	local player = game.Players.LocalPlayer
+-- Get the local player
+local player = game.Players.LocalPlayer
 
-	-- Function to fire TouchInterests and make specific parts transparent
-	local function checkOwnerAndFireTouchInterests()
-		local factoriesFolder = workspace:FindFirstChild("Fros Studio's Tycoon Kit") and workspace["Fros Studio's Tycoon Kit"]:FindFirstChild("Factories")
-		local warehousesFolder = workspace:FindFirstChild("Fros Studio's Tycoon Kit") and workspace["Fros Studio's Tycoon Kit"]:FindFirstChild("Warehouses")
-		if not factoriesFolder or not warehousesFolder then return end
+-- Function to fire TouchInterests and make specific parts transparent
+local function checkOwnerAndFireTouchInterests()
+    local factoriesFolder = workspace:FindFirstChild("Fros Studio's Tycoon Kit") and workspace["Fros Studio's Tycoon Kit"]:FindFirstChild("Factories")
+    local warehousesFolder = workspace:FindFirstChild("Fros Studio's Tycoon Kit") and workspace["Fros Studio's Tycoon Kit"]:FindFirstChild("Warehouses")
+    if not factoriesFolder or not warehousesFolder then return end
 
-		local playerName = player.Name
+    local playerName = player.Name
 
-		-- Loop through all factories
-		for _, factory in pairs(factoriesFolder:GetChildren()) do
-			-- Check the Owner value
-			local ownerValue = factory:FindFirstChild("Owner")
-			if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
-				-- Fire TouchInterest on the "PacketCreate1" part
-				local packetCreate = factory:FindFirstChild("PurchasedObjects")
-					and factory.PurchasedObjects:FindFirstChild("ScannerPacketo")
-					and factory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate1")
-				if packetCreate and packetCreate:IsA("Part") then
-					local characterPrimaryPart = player.Character and player.Character.PrimaryPart
-					if characterPrimaryPart then
-						-- Fire touch events on "PacketCreate1"
-						firetouchinterest(packetCreate, characterPrimaryPart, 0)
-						firetouchinterest(packetCreate, characterPrimaryPart, 1)
+    -- Loop through all factories
+    for _, factory in pairs(factoriesFolder:GetChildren()) do
+        -- Check the Owner value
+        local ownerValue = factory:FindFirstChild("Owner")
+        if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
+            -- Fire TouchInterest on the "PacketCreate1" part
+            local packetCreate = factory:FindFirstChild("PurchasedObjects")
+                and factory.PurchasedObjects:FindFirstChild("ScannerPacketo")
+                and factory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate1")
+            if packetCreate and packetCreate:IsA("Part") then
+                local characterPrimaryPart = player.Character and player.Character.PrimaryPart
+                if characterPrimaryPart then
+                    -- Fire touch events on "PacketCreate1"
+                    firetouchinterest(packetCreate, characterPrimaryPart, 0)
+                    firetouchinterest(packetCreate, characterPrimaryPart, 1)
 
-						-- Make "PacketCreate1" transparent
-						packetCreate.Transparency = 1
-						packetCreate.CanCollide = false
-					end
-				end
-			end
-		end
-		task.wait(1)
-		-- Loop through all warehouses
-		for _, warehouse in pairs(warehousesFolder:GetChildren()) do
-			-- Check the Owner value
-			local ownerValue = warehouse:FindFirstChild("Owner")
-			if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
-				-- Fire TouchInterest on the "Poort" part
-				local poort = warehouse:FindFirstChild("PurchasedObjects")
-					and warehouse.PurchasedObjects:FindFirstChild("GAD01")
-					and warehouse.PurchasedObjects.GAD01:FindFirstChild("Poort")
-				if poort and poort:IsA("Part") then
-					local characterPrimaryPart = player.Character and player.Character.PrimaryPart
-					if characterPrimaryPart then
-						-- Fire touch events on "Poort"
-						firetouchinterest(poort, characterPrimaryPart, 0)
-						firetouchinterest(poort, characterPrimaryPart, 1)
+                    -- Make "PacketCreate1" transparent
+                    packetCreate.Transparency = 1
+                    packetCreate.CanCollide = false
+                end
+            end
+        end
+    end
 
-						-- Make "Poort" transparent
-						poort.Transparency = 1
-						poort.CanCollide = false
-					end
-				end
-			end
-		end
-	end
+    task.wait(1)
 
-	-- Run the function in a loop every second
-	while true do
-		checkOwnerAndFireTouchInterests()
-		task.wait(1)  -- Loop every second
-	end
+    -- Loop through all warehouses
+    for _, warehouse in pairs(warehousesFolder:GetChildren()) do
+        -- Check the Owner value
+        local ownerValue = warehouse:FindFirstChild("Owner")
+        if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
+            -- Fire TouchInterest on the "Poort" part in GAD01 and GAD02
+            local poortGAD01 = warehouse:FindFirstChild("PurchasedObjects")
+                and warehouse.PurchasedObjects:FindFirstChild("GAD01")
+                and warehouse.PurchasedObjects.GAD01:FindFirstChild("Poort")
+            local poortGAD02 = warehouse:FindFirstChild("PurchasedObjects")
+                and warehouse.PurchasedObjects:FindFirstChild("GAD02")
+                and warehouse.PurchasedObjects.GAD02:FindFirstChild("Poort")
 
+            -- Process Poort from GAD01
+            if poortGAD01 and poortGAD01:IsA("Part") then
+                local characterPrimaryPart = player.Character and player.Character.PrimaryPart
+                if characterPrimaryPart then
+                    -- Fire touch events on "Poort" from GAD01
+                    firetouchinterest(poortGAD01, characterPrimaryPart, 0)
+                    firetouchinterest(poortGAD01, characterPrimaryPart, 1)
+
+                    -- Make "Poort" transparent
+                    poortGAD01.Transparency = 1
+                    poortGAD01.CanCollide = false
+                end
+            end
+
+            -- Process Poort from GAD02
+            if poortGAD02 and poortGAD02:IsA("Part") then
+                local characterPrimaryPart = player.Character and player.Character.PrimaryPart
+                if characterPrimaryPart then
+                    -- Fire touch events on "Poort" from GAD02
+                    firetouchinterest(poortGAD02, characterPrimaryPart, 0)
+                    firetouchinterest(poortGAD02, characterPrimaryPart, 1)
+
+                    -- Make "Poort" transparent
+                    poortGAD02.Transparency = 1
+                    poortGAD02.CanCollide = false
+                end
+            end
+        end
+    end
+end
+
+-- Run the function in a loop every second
+while true do
+    checkOwnerAndFireTouchInterests()
+    task.wait(1)  -- Loop every second
+end
+		
 end)
 
 AutoFactory.MouseButton1Down:connect(function()
@@ -561,14 +582,12 @@ TreeFarm.MouseButton1Down:connect(function()
 end)
 
 DeleteHazards.MouseButton1Down:connect(function()
--- Function to delete all parts in the specified folder
-local function deleteAllParts(folder)
+-- Function to delete all objects in the specified folder
+local function deleteAllObjects(folder)
     if not folder then return end
 
     for _, obj in pairs(folder:GetDescendants()) do
-        if obj:IsA("Part") then
-            obj:Destroy()
-        end
+        obj:Destroy()
     end
 end
 
@@ -578,6 +597,24 @@ local function deleteAllChildren(folder)
 
     for _, child in pairs(folder:GetChildren()) do
         child:Destroy()
+    end
+end
+
+-- Function to delete all objects in workspace containing "OwnerDoor" in their name
+local function deleteOwnerDoorObjects()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj.Name:find("OwnerDoor") then
+            obj:Destroy()
+        end
+    end
+end
+
+-- Function to delete all objects named "R7_Door"
+local function deleteR7DoorObjects()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj.Name == "R7_Door" then
+            obj:Destroy()
+        end
     end
 end
 
@@ -603,7 +640,7 @@ local guisFolder = workspace:FindFirstChild("Game") and workspace.Game:FindFirst
 local gameSlotjeFolder = workspace:FindFirstChild("GameSlotje")
 
 -- Call the functions to delete all parts and children
-deleteAllParts(gifInFolder)
+deleteAllObjects(gifInFolder)
 
 if lavaFolder then
     deleteAllChildren(lavaFolder)
@@ -627,6 +664,12 @@ if gameSlotjeFolder then
 else
     warn("workspace.GameSlotje folder not found.")
 end
+
+-- Delete all objects containing "OwnerDoor" anywhere in their name
+deleteOwnerDoorObjects()
+
+-- Delete all objects named "R7_Door"
+deleteR7DoorObjects()
 
 end)
 
