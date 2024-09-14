@@ -354,49 +354,49 @@ local function checkOwnerAndFireTouchInterests()
                     packetCreate.CanCollide = false
                 end
             end
+            
+            -- Fire TouchInterest on "PacketCreate2" for TixFactory#4
+            local tixFactory = workspace:FindFirstChild("Fros Studio's Tycoon Kit") 
+                and workspace["Fros Studio's Tycoon Kit"].Factories:FindFirstChild("TixFactory#4")
+            local packetCreate2 = tixFactory
+                and tixFactory:FindFirstChild("PurchasedObjects")
+                and tixFactory.PurchasedObjects:FindFirstChild("ScannerPacketo")
+                and tixFactory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate2")
+            if packetCreate2 and packetCreate2:IsA("Part") then
+                local characterPrimaryPart = player.Character and player.Character.PrimaryPart
+                if characterPrimaryPart then
+                    -- Fire touch events on "PacketCreate2"
+                    firetouchinterest(packetCreate2, characterPrimaryPart, 0)
+                    firetouchinterest(packetCreate2, characterPrimaryPart, 1)
+
+                    -- Make "PacketCreate2" transparent
+                    packetCreate2.Transparency = 1
+                    packetCreate2.CanCollide = false
+                end
+            end
         end
     end
 
     task.wait(1)
-
     -- Loop through all warehouses
     for _, warehouse in pairs(warehousesFolder:GetChildren()) do
         -- Check the Owner value
         local ownerValue = warehouse:FindFirstChild("Owner")
         if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
-            -- Fire TouchInterest on the "Poort" part in GAD01 and GAD02
-            local poortGAD01 = warehouse:FindFirstChild("PurchasedObjects")
+            -- Fire TouchInterest on the "Poort" part
+            local poort = warehouse:FindFirstChild("PurchasedObjects")
                 and warehouse.PurchasedObjects:FindFirstChild("GAD01")
                 and warehouse.PurchasedObjects.GAD01:FindFirstChild("Poort")
-            local poortGAD02 = warehouse:FindFirstChild("PurchasedObjects")
-                and warehouse.PurchasedObjects:FindFirstChild("GAD02")
-                and warehouse.PurchasedObjects.GAD02:FindFirstChild("Poort")
-
-            -- Process Poort from GAD01
-            if poortGAD01 and poortGAD01:IsA("Part") then
+            if poort and poort:IsA("Part") then
                 local characterPrimaryPart = player.Character and player.Character.PrimaryPart
                 if characterPrimaryPart then
-                    -- Fire touch events on "Poort" from GAD01
-                    firetouchinterest(poortGAD01, characterPrimaryPart, 0)
-                    firetouchinterest(poortGAD01, characterPrimaryPart, 1)
+                    -- Fire touch events on "Poort"
+                    firetouchinterest(poort, characterPrimaryPart, 0)
+                    firetouchinterest(poort, characterPrimaryPart, 1)
 
                     -- Make "Poort" transparent
-                    poortGAD01.Transparency = 1
-                    poortGAD01.CanCollide = false
-                end
-            end
-
-            -- Process Poort from GAD02
-            if poortGAD02 and poortGAD02:IsA("Part") then
-                local characterPrimaryPart = player.Character and player.Character.PrimaryPart
-                if characterPrimaryPart then
-                    -- Fire touch events on "Poort" from GAD02
-                    firetouchinterest(poortGAD02, characterPrimaryPart, 0)
-                    firetouchinterest(poortGAD02, characterPrimaryPart, 1)
-
-                    -- Make "Poort" transparent
-                    poortGAD02.Transparency = 1
-                    poortGAD02.CanCollide = false
+                    poort.Transparency = 1
+                    poort.CanCollide = false
                 end
             end
         end
@@ -408,7 +408,7 @@ while true do
     checkOwnerAndFireTouchInterests()
     task.wait(1)  -- Loop every second
 end
-		
+	
 end)
 
 AutoFactory.MouseButton1Down:connect(function()
