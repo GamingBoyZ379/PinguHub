@@ -690,6 +690,7 @@ local function processTouchInterests(folder)
 				end
 
 				-- Disable collision for the part
+				obj.Transparency = 1
 				obj.CanCollide = false
 			end
 		end
@@ -707,14 +708,18 @@ local function processFolders()
 	local forgotPieceFolder = oresFolder and oresFolder:FindFirstChild("Forgot_Piece")
 	local uraniumTixFolder = oresFolder and oresFolder:FindFirstChild("UraniumTix")
 	local goldPieceFolder = oresFolder and oresFolder:FindFirstChild("Gold_Piece")
-                local rainbow6Folder = eventsFolder and eventsFolder:FindFirstChild("Default") and eventsFolder.Default:FindFirstChild("Rainbow6") and eventsFolder.Default.Rainbow6:FindFirstChild("Reward")
-
+        local tixiumFolder = oresFolder and oresFolder:FindFirstChild("Tixium")
+        local crystaltixFolder = oresFolder and oresFolder:FindFirstChild("CrystalTix")
+        local uranuiumFolder = oresFolder and oresFolder:FindFirstChild("Uranium")
+			
 	processTouchInterests(eventsFolder)
 	processTouchInterests(lavaTixFolder)
 	processTouchInterests(forgotPieceFolder)
 	processTouchInterests(uraniumTixFolder)
 	processTouchInterests(goldPieceFolder)
-	processTouchInterests(rainbow6Folder)
+	processTouchInterests(tixiumFolder)
+	processTouchInterests(crystaltixFolder)
+        processTouchInterests(uraniumFolder)
 end
 
 -- Initial call to process existing TouchInterests
