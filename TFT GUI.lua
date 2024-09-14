@@ -355,8 +355,11 @@ AutoPacket.MouseButton1Down:connect(function()
 
 	-- Function to fire TouchInterests and make specific parts transparent
 	local function checkOwnerAndFireTouchInterests()
-		local factoriesFolder = workspace:FindFirstChild("Fros Studio's Tycoon Kit") and workspace["Fros Studio's Tycoon Kit"]:FindFirstChild("Factories")
-		local warehousesFolder = workspace:FindFirstChild("Fros Studio's Tycoon Kit") and workspace["Fros Studio's Tycoon Kit"]:FindFirstChild("Warehouses")
+		local tycoonKitFolder = workspace:FindFirstChild("Fros Studio's Tycoon Kit")
+		if not tycoonKitFolder then return end
+
+		local factoriesFolder = tycoonKitFolder:FindFirstChild("Factories")
+		local warehousesFolder = tycoonKitFolder:FindFirstChild("Warehouses")
 		if not factoriesFolder or not warehousesFolder then return end
 
 		local playerName = player.Name
@@ -367,29 +370,28 @@ AutoPacket.MouseButton1Down:connect(function()
 			local ownerValue = factory:FindFirstChild("Owner")
 			if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
 				-- Fire TouchInterest on the "PacketCreate1" part
-				local packetCreate = factory:FindFirstChild("PurchasedObjects")
+				local packetCreate1 = factory:FindFirstChild("PurchasedObjects")
 					and factory.PurchasedObjects:FindFirstChild("ScannerPacketo")
 					and factory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate1")
-				if packetCreate and packetCreate:IsA("Part") then
+
+				if packetCreate1 and packetCreate1:IsA("Part") then
 					local characterPrimaryPart = player.Character and player.Character.PrimaryPart
 					if characterPrimaryPart then
 						-- Fire touch events on "PacketCreate1"
-						firetouchinterest(packetCreate, characterPrimaryPart, 0)
-						firetouchinterest(packetCreate, characterPrimaryPart, 1)
+						firetouchinterest(packetCreate1, characterPrimaryPart, 0)
+						firetouchinterest(packetCreate1, characterPrimaryPart, 1)
 
 						-- Make "PacketCreate1" transparent
-						packetCreate.Transparency = 1
-						packetCreate.CanCollide = false
+						packetCreate1.Transparency = 1
+						packetCreate1.CanCollide = false
 					end
 				end
 
-				-- Fire TouchInterest on "PacketCreate2" for TixFactory#4
-				local tixFactory = workspace:FindFirstChild("Fros Studio's Tycoon Kit") 
-					and workspace["Fros Studio's Tycoon Kit"].Factories:FindFirstChild("TixFactory#4")
-				local packetCreate2 = tixFactory
-					and tixFactory:FindFirstChild("PurchasedObjects")
-					and tixFactory.PurchasedObjects:FindFirstChild("ScannerPacketo")
-					and tixFactory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate2")
+				-- Fire TouchInterest on the "PacketCreate2" part
+				local packetCreate2 = factory:FindFirstChild("PurchasedObjects")
+					and factory.PurchasedObjects:FindFirstChild("ScannerPacketo")
+					and factory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate2")
+
 				if packetCreate2 and packetCreate2:IsA("Part") then
 					local characterPrimaryPart = player.Character and player.Character.PrimaryPart
 					if characterPrimaryPart then
@@ -406,6 +408,7 @@ AutoPacket.MouseButton1Down:connect(function()
 		end
 
 		task.wait(1)
+
 		-- Loop through all warehouses
 		for _, warehouse in pairs(warehousesFolder:GetChildren()) do
 			-- Check the Owner value
@@ -425,6 +428,23 @@ AutoPacket.MouseButton1Down:connect(function()
 						-- Make "Poort" transparent
 						poort.Transparency = 1
 						poort.CanCollide = false
+					end
+				end
+
+				-- Fire TouchInterest on the "Poort2" part
+				local poort2 = warehouse:FindFirstChild("PurchasedObjects")
+					and warehouse.PurchasedObjects:FindFirstChild("GAD02")
+					and warehouse.PurchasedObjects.GAD02:FindFirstChild("Poort")
+				if poort2 and poort2:IsA("Part") then
+					local characterPrimaryPart = player.Character and player.Character.PrimaryPart
+					if characterPrimaryPart then
+						-- Fire touch events on "Poort2"
+						firetouchinterest(poort2, characterPrimaryPart, 0)
+						firetouchinterest(poort2, characterPrimaryPart, 1)
+
+						-- Make "Poort2" transparent
+						poort2.Transparency = 1
+						poort2.CanCollide = false
 					end
 				end
 			end
