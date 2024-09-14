@@ -712,62 +712,59 @@ DeleteHazards.MouseButton1Down:connect(function()
 end)
 
 TPTix.MouseButton1Down:connect(function()
-	-- Function to fire all TouchInterests and optionally disable collisions
-	local function processTouchInterests(folder)
-		if not folder then return end
+-- Function to fire all TouchInterests and optionally disable collisions
+local function processTouchInterests(folder)
+    if not folder then return end
 
-		for _, obj in pairs(folder:GetDescendants()) do
-			if obj:IsA("Part") then
-				local touchInterest = obj:FindFirstChild("TouchInterest")
-				if touchInterest then
-					-- Make the part transparent and non-collidable
-					obj.Transparency = 1
-					obj.CanCollide = false
+    for _, obj in pairs(folder:GetDescendants()) do
+        if obj:IsA("Part") then
+            local touchInterest = obj:FindFirstChild("TouchInterest")
+            if touchInterest then
+                -- Make the part transparent and non-collidable
+                obj.Transparency = 1
+                obj.CanCollide = false
 
-					-- Fire touch events
-					local characterPrimaryPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.PrimaryPart
-					if characterPrimaryPart then
-						firetouchinterest(obj, characterPrimaryPart, 0)
-						firetouchinterest(obj, characterPrimaryPart, 1)
-					end
-				end
-			end
-		end
-	end
+                -- Fire touch events
+                local characterPrimaryPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.PrimaryPart
+                if characterPrimaryPart then
+                    firetouchinterest(obj, characterPrimaryPart, 0)
+                    firetouchinterest(obj, characterPrimaryPart, 1)
+                end
+            end
+        end
+    end
+end
 
-	-- Process specified folders
-	local function processFolders()
-		local gameFolder = workspace:FindFirstChild("Game")
-		if not gameFolder then return end
+-- Process specified folders
+local function processFolders()
+    local gameFolder = workspace:FindFirstChild("Game")
+    if not gameFolder then return end
 
-		local eventsFolder = gameFolder:FindFirstChild("Events")
-		local oresFolder = gameFolder:FindFirstChild("Ores")
-		local lavaTixFolder = oresFolder and oresFolder:FindFirstChild("LavaTix")
-		local forgotPieceFolder = oresFolder and oresFolder:FindFirstChild("Forgot_Piece")
-		local uraniumTixFolder = oresFolder and oresFolder:FindFirstChild("Uranium")
-		local goldPieceFolder = oresFolder and oresFolder:FindFirstChild("Gold_Piece")
-		local crystaltixFolder = oresFolder and oresFolder:FindFirstChild("CrystalTix")
-		local tixiumFolder = oresFolder and oresFolder:FindFirstChild("Tixium")
-		local drTixiumFolder = oresFolder and oresFolder:FindFirstChild("DR_Tixium")
+    local eventsFolder = gameFolder:FindFirstChild("Events")
+    local oresFolder = gameFolder:FindFirstChild("Ores")
+    local lavaTixFolder = oresFolder and oresFolder:FindFirstChild("LavaTix")
+    local forgotPieceFolder = oresFolder and oresFolder:FindFirstChild("Forgot_Piece")
+    local uraniumTixFolder = oresFolder and oresFolder:FindFirstChild("Uranium")
+    local goldPieceFolder = oresFolder and oresFolder:FindFirstChild("Gold_Piece")
+    local crystaltixFolder = oresFolder and oresFolder:FindFirstChild("CrystalTix")
 
-		processTouchInterests(eventsFolder)
-		processTouchInterests(lavaTixFolder)
-		processTouchInterests(forgotPieceFolder)
-		processTouchInterests(uraniumTixFolder)
-		processTouchInterests(goldPieceFolder)
-		processTouchInterests(crystaltixFolder)
-		processTouchInterests(tixiumFolder)
-		processTouchInterests(drTixiumFolder)
-	end
+    processTouchInterests(eventsFolder)
+    processTouchInterests(lavaTixFolder)
+    processTouchInterests(forgotPieceFolder)
+    processTouchInterests(uraniumTixFolder)
+    processTouchInterests(goldPieceFolder)
+    processTouchInterests(crystaltixFolder)
 
-	-- Initial call to process existing TouchInterests
-	processFolders()
+end
 
-	-- Continuously check and process TouchInterests every 10 seconds
-	while true do
-		task.wait() -- Adjust the wait time as needed
-		processFolders()
-	end
+-- Initial call to process existing TouchInterests
+processFolders()
+
+-- Continuously check and process TouchInterests every 10 seconds
+while true do
+    task.wait(10) -- Adjust the wait time as needed
+    processFolders()
+end
 
 end)
 
