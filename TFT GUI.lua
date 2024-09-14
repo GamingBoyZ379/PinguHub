@@ -859,13 +859,11 @@ AddLeaderstats.MouseButton1Down:connect(function()
 	local function updateLeaderstat(player, slotName, currencyName)
 		local tixFactory = player:FindFirstChild("TixFactoryBoardNew")
 		if not tixFactory then
-			warn("TixFactoryBoardNew not found for player: " .. player.Name)
 			return
 		end
 
 		local currencies = tixFactory:FindFirstChild("Currencies")
-		if not currencies then
-			warn("Currencies not found for player: " .. player.Name)
+		if not currencies then			
 			return
 		end
 
@@ -917,19 +915,16 @@ AddLeaderstats.MouseButton1Down:connect(function()
 
 		local tixFactoryBoard = player:FindFirstChild("TixFactoryBoardNew")
 		if not tixFactoryBoard then
-			warn("TixFactoryBoardNew not found for player:", player.Name)
 			return
 		end
 
 		local currencies = tixFactoryBoard:FindFirstChild("Currencies")
 		if not currencies then
-			warn("Currencies not found in TixFactoryBoardNew for player:", player.Name)
 			return
 		end
 
 		local rebornValue = currencies:FindFirstChild("Reborn")
 		if not rebornValue then
-			warn("Reborn value not found in Currencies for player:", player.Name)
 			return
 		end
 
@@ -940,7 +935,6 @@ AddLeaderstats.MouseButton1Down:connect(function()
 	local function setupLocalPlayerLeaderstats()
 		local gui = LocalPlayer.TixFactoryBoardNew:FindFirstChild("Gui")
 		if not gui then
-			warn("Gui not found for LocalPlayer")
 			return
 		end
 
@@ -950,7 +944,6 @@ AddLeaderstats.MouseButton1Down:connect(function()
 				local currencyName = slotValue.Value
 				updateLeaderstat(LocalPlayer, slotName, currencyName)
 			else
-				warn("SlotValue not found: " .. slotName)
 			end
 		end
 
@@ -964,7 +957,6 @@ AddLeaderstats.MouseButton1Down:connect(function()
 		else
 			local gui = LocalPlayer.TixFactoryBoardNew:FindFirstChild("Gui")
 			if not gui then
-				warn("Gui not found for LocalPlayer")
 				return
 			end
 
@@ -974,7 +966,6 @@ AddLeaderstats.MouseButton1Down:connect(function()
 					local currencyName = slotValue.Value
 					updateLeaderstat(player, slotName, currencyName)
 				else
-					warn("SlotValue not found: " .. slotName)
 				end
 			end
 
