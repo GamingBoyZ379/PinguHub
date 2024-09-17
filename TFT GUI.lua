@@ -17,6 +17,7 @@ local PlayerFrame = Instance.new("Frame")
 local AddLeaderstats = Instance.new("TextButton")
 local FakeResearch = Instance.new("TextButton")
 local SpoofPlayer = Instance.new("TextButton")
+local UnlockTrades = Instance.new("TextButton")
 local WorldFrame = Instance.new("Frame")
 local DeleteHazards = Instance.new("TextButton")
 local TPTix = Instance.new("TextButton")
@@ -176,6 +177,19 @@ SpoofPlayer.TextColor3 = Color3.fromRGB(0, 0, 0)
 SpoofPlayer.TextScaled = true
 SpoofPlayer.TextSize = 14.000
 SpoofPlayer.TextWrapped = true
+
+UnlockTrades.Name = "UnlockTrades"
+UnlockTrades.Parent = PlayerFrame
+UnlockTrades.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+UnlockTrades.BorderColor3 = Color3.fromRGB(27, 42, 53)
+UnlockTrades.Position = UDim2.new(0.497500449, 0, 0.36900112, 0)
+UnlockTrades.Size = UDim2.new(0, 200, 0, 40)
+UnlockTrades.Font = Enum.Font.SourceSans
+UnlockTrades.Text = "Unlock Tix Trades"
+UnlockTrades.TextColor3 = Color3.fromRGB(0, 0, 0)
+UnlockTrades.TextScaled = true
+UnlockTrades.TextSize = 14.000
+UnlockTrades.TextWrapped = true
 
 WorldFrame.Name = "WorldFrame"
 WorldFrame.Parent = MainFrame
@@ -364,112 +378,112 @@ FakeResearch.MouseButton1Down:connect(function()
 end)
 
 AutoPacket.MouseButton1Down:connect(function()
--- Get the local player
-local player = game.Players.LocalPlayer
+	-- Get the local player
+	local player = game.Players.LocalPlayer
 
--- Function to fire TouchInterests and make specific parts transparent
-local function checkOwnerAndFireTouchInterests()
-    local tycoonKitFolder = workspace:FindFirstChild("Fros Studio's Tycoon Kit")
-    if not tycoonKitFolder then return end
+	-- Function to fire TouchInterests and make specific parts transparent
+	local function checkOwnerAndFireTouchInterests()
+		local tycoonKitFolder = workspace:FindFirstChild("Fros Studio's Tycoon Kit")
+		if not tycoonKitFolder then return end
 
-    local factoriesFolder = tycoonKitFolder:FindFirstChild("Factories")
-    local warehousesFolder = tycoonKitFolder:FindFirstChild("Warehouses")
-    if not factoriesFolder or not warehousesFolder then return end
+		local factoriesFolder = tycoonKitFolder:FindFirstChild("Factories")
+		local warehousesFolder = tycoonKitFolder:FindFirstChild("Warehouses")
+		if not factoriesFolder or not warehousesFolder then return end
 
-    local playerName = player.Name
+		local playerName = player.Name
 
-    -- Loop through all factories
-    for _, factory in pairs(factoriesFolder:GetChildren()) do
-        -- Check the Owner value
-        local ownerValue = factory:FindFirstChild("Owner")
-        if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
-            -- Fire TouchInterest on the "PacketCreate1" part
-            local packetCreate1 = factory:FindFirstChild("PurchasedObjects")
-                and factory.PurchasedObjects:FindFirstChild("ScannerPacketo")
-                and factory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate1")
+		-- Loop through all factories
+		for _, factory in pairs(factoriesFolder:GetChildren()) do
+			-- Check the Owner value
+			local ownerValue = factory:FindFirstChild("Owner")
+			if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
+				-- Fire TouchInterest on the "PacketCreate1" part
+				local packetCreate1 = factory:FindFirstChild("PurchasedObjects")
+					and factory.PurchasedObjects:FindFirstChild("ScannerPacketo")
+					and factory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate1")
 
-            if packetCreate1 and packetCreate1:IsA("Part") then
-                local characterPrimaryPart = player.Character and player.Character.PrimaryPart
-                if characterPrimaryPart then
-                    -- Fire touch events on "PacketCreate1"
-                    firetouchinterest(packetCreate1, characterPrimaryPart, 0)
-                    firetouchinterest(packetCreate1, characterPrimaryPart, 1)
+				if packetCreate1 and packetCreate1:IsA("Part") then
+					local characterPrimaryPart = player.Character and player.Character.PrimaryPart
+					if characterPrimaryPart then
+						-- Fire touch events on "PacketCreate1"
+						firetouchinterest(packetCreate1, characterPrimaryPart, 0)
+						firetouchinterest(packetCreate1, characterPrimaryPart, 1)
 
-                    -- Make "PacketCreate1" transparent
-                    packetCreate1.Transparency = 1
-                    packetCreate1.CanCollide = false
-                end
-            end
+						-- Make "PacketCreate1" transparent
+						packetCreate1.Transparency = 1
+						packetCreate1.CanCollide = false
+					end
+				end
 
-            -- Fire TouchInterest on the "PacketCreate2" part
-            local packetCreate2 = factory:FindFirstChild("PurchasedObjects")
-                and factory.PurchasedObjects:FindFirstChild("ScannerPacketo")
-                and factory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate2")
+				-- Fire TouchInterest on the "PacketCreate2" part
+				local packetCreate2 = factory:FindFirstChild("PurchasedObjects")
+					and factory.PurchasedObjects:FindFirstChild("ScannerPacketo")
+					and factory.PurchasedObjects.ScannerPacketo:FindFirstChild("PacketCreate2")
 
-            if packetCreate2 and packetCreate2:IsA("Part") then
-                local characterPrimaryPart = player.Character and player.Character.PrimaryPart
-                if characterPrimaryPart then
-                    -- Fire touch events on "PacketCreate2"
-                    firetouchinterest(packetCreate2, characterPrimaryPart, 0)
-                    firetouchinterest(packetCreate2, characterPrimaryPart, 1)
+				if packetCreate2 and packetCreate2:IsA("Part") then
+					local characterPrimaryPart = player.Character and player.Character.PrimaryPart
+					if characterPrimaryPart then
+						-- Fire touch events on "PacketCreate2"
+						firetouchinterest(packetCreate2, characterPrimaryPart, 0)
+						firetouchinterest(packetCreate2, characterPrimaryPart, 1)
 
-                    -- Make "PacketCreate2" transparent
-                    packetCreate2.Transparency = 1
-                    packetCreate2.CanCollide = false
-                end
-            end
-        end
-    end
+						-- Make "PacketCreate2" transparent
+						packetCreate2.Transparency = 1
+						packetCreate2.CanCollide = false
+					end
+				end
+			end
+		end
 
-    task.wait(1)
+		task.wait(1)
 
-    -- Loop through all warehouses
-    for _, warehouse in pairs(warehousesFolder:GetChildren()) do
-        -- Check the Owner value
-        local ownerValue = warehouse:FindFirstChild("Owner")
-        if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
-            -- Fire TouchInterest on the "Poort" part
-            local poort = warehouse:FindFirstChild("PurchasedObjects")
-                and warehouse.PurchasedObjects:FindFirstChild("GAD01")
-                and warehouse.PurchasedObjects.GAD01:FindFirstChild("Poort")
-            if poort and poort:IsA("Part") then
-                local characterPrimaryPart = player.Character and player.Character.PrimaryPart
-                if characterPrimaryPart then
-                    -- Fire touch events on "Poort"
-                    firetouchinterest(poort, characterPrimaryPart, 0)
-                    firetouchinterest(poort, characterPrimaryPart, 1)
+		-- Loop through all warehouses
+		for _, warehouse in pairs(warehousesFolder:GetChildren()) do
+			-- Check the Owner value
+			local ownerValue = warehouse:FindFirstChild("Owner")
+			if ownerValue and ownerValue:IsA("ObjectValue") and ownerValue.Value and ownerValue.Value.Name == playerName then
+				-- Fire TouchInterest on the "Poort" part
+				local poort = warehouse:FindFirstChild("PurchasedObjects")
+					and warehouse.PurchasedObjects:FindFirstChild("GAD01")
+					and warehouse.PurchasedObjects.GAD01:FindFirstChild("Poort")
+				if poort and poort:IsA("Part") then
+					local characterPrimaryPart = player.Character and player.Character.PrimaryPart
+					if characterPrimaryPart then
+						-- Fire touch events on "Poort"
+						firetouchinterest(poort, characterPrimaryPart, 0)
+						firetouchinterest(poort, characterPrimaryPart, 1)
 
-                    -- Make "Poort" transparent
-                    poort.Transparency = 1
-                    poort.CanCollide = false
-                end
-            end
+						-- Make "Poort" transparent
+						poort.Transparency = 1
+						poort.CanCollide = false
+					end
+				end
 
-            -- Fire TouchInterest on the "Poort2" part
-            local poort2 = warehouse:FindFirstChild("PurchasedObjects")
-                and warehouse.PurchasedObjects:FindFirstChild("GAD02")
-                and warehouse.PurchasedObjects.GAD02:FindFirstChild("Poort")
-            if poort2 and poort2:IsA("Part") then
-                local characterPrimaryPart = player.Character and player.Character.PrimaryPart
-                if characterPrimaryPart then
-                    -- Fire touch events on "Poort2"
-                    firetouchinterest(poort2, characterPrimaryPart, 0)
-                    firetouchinterest(poort2, characterPrimaryPart, 1)
+				-- Fire TouchInterest on the "Poort2" part
+				local poort2 = warehouse:FindFirstChild("PurchasedObjects")
+					and warehouse.PurchasedObjects:FindFirstChild("GAD02")
+					and warehouse.PurchasedObjects.GAD02:FindFirstChild("Poort")
+				if poort2 and poort2:IsA("Part") then
+					local characterPrimaryPart = player.Character and player.Character.PrimaryPart
+					if characterPrimaryPart then
+						-- Fire touch events on "Poort2"
+						firetouchinterest(poort2, characterPrimaryPart, 0)
+						firetouchinterest(poort2, characterPrimaryPart, 1)
 
-                    -- Make "Poort2" transparent
-                    poort2.Transparency = 1
-                    poort2.CanCollide = false
-                end
-            end
-        end
-    end
-end
+						-- Make "Poort2" transparent
+						poort2.Transparency = 1
+						poort2.CanCollide = false
+					end
+				end
+			end
+		end
+	end
 
--- Run the function in a loop every second
-while true do
-    checkOwnerAndFireTouchInterests()
-    task.wait(1)  -- Loop every second
-end
+	-- Run the function in a loop every second
+	while true do
+		checkOwnerAndFireTouchInterests()
+		task.wait(1)  -- Loop every second
+	end
 
 end)
 
@@ -726,59 +740,62 @@ DeleteHazards.MouseButton1Down:connect(function()
 end)
 
 TPTix.MouseButton1Down:connect(function()
--- Function to fire all TouchInterests and optionally disable collisions
-local function processTouchInterests(folder)
-    if not folder then return end
+	-- Function to fire all TouchInterests and optionally disable collisions
+	local function processTouchInterests(folder)
+		if not folder then return end
 
-    for _, obj in pairs(folder:GetDescendants()) do
-        if obj:IsA("Part") then
-            local touchInterest = obj:FindFirstChild("TouchInterest")
-            if touchInterest then
-                -- Make the part transparent and non-collidable
-                obj.Transparency = 1
-                obj.CanCollide = false
+		for _, obj in pairs(folder:GetDescendants()) do
+			if obj:IsA("Part") then
+				local touchInterest = obj:FindFirstChild("TouchInterest")
+				if touchInterest then
+					-- Make the part transparent and non-collidable
+					obj.Transparency = 1
+					obj.CanCollide = false
 
-                -- Fire touch events
-                local characterPrimaryPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.PrimaryPart
-                if characterPrimaryPart then
-                    firetouchinterest(obj, characterPrimaryPart, 0)
-                    firetouchinterest(obj, characterPrimaryPart, 1)
-                end
-            end
-        end
-    end
-end
+					-- Fire touch events
+					local characterPrimaryPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.PrimaryPart
+					if characterPrimaryPart then
+						firetouchinterest(obj, characterPrimaryPart, 0)
+						firetouchinterest(obj, characterPrimaryPart, 1)
+					end
+				end
+			end
+		end
+	end
 
--- Process specified folders
-local function processFolders()
-    local gameFolder = workspace:FindFirstChild("Game")
-    if not gameFolder then return end
+	-- Process specified folders
+	local function processFolders()
+		local gameFolder = workspace:FindFirstChild("Game")
+		if not gameFolder then return end
 
-    local eventsFolder = gameFolder:FindFirstChild("Events")
-    local oresFolder = gameFolder:FindFirstChild("Ores")
-    local lavaTixFolder = oresFolder and oresFolder:FindFirstChild("LavaTix")
-    local forgotPieceFolder = oresFolder and oresFolder:FindFirstChild("Forgot_Piece")
-    local uraniumTixFolder = oresFolder and oresFolder:FindFirstChild("Uranium")
-    local goldPieceFolder = oresFolder and oresFolder:FindFirstChild("Gold_Piece")
-    local crystaltixFolder = oresFolder and oresFolder:FindFirstChild("CrystalTix")
+		local eventsFolder = gameFolder:FindFirstChild("Events")
+		local oresFolder = gameFolder:FindFirstChild("Ores")
+		local lavaTixFolder = oresFolder and oresFolder:FindFirstChild("LavaTix")
+		local forgotPieceFolder = oresFolder and oresFolder:FindFirstChild("Forgot_Piece")
+		local uraniumTixFolder = oresFolder and oresFolder:FindFirstChild("Uranium")
+		local goldPieceFolder = oresFolder and oresFolder:FindFirstChild("Gold_Piece")
+		local crystaltixFolder = oresFolder and oresFolder:FindFirstChild("CrystalTix")
+		local tixiumFolder = oresFolder and oresFolder:FindFirstChild("Tixium")
+		local drTixiumFolder = oresFolder and oresFolder:FindFirstChild("DR_Tixium")
 
-    processTouchInterests(eventsFolder)
-    processTouchInterests(lavaTixFolder)
-    processTouchInterests(forgotPieceFolder)
-    processTouchInterests(uraniumTixFolder)
-    processTouchInterests(goldPieceFolder)
-    processTouchInterests(crystaltixFolder)
+		processTouchInterests(eventsFolder)
+		processTouchInterests(lavaTixFolder)
+		processTouchInterests(forgotPieceFolder)
+		processTouchInterests(uraniumTixFolder)
+		processTouchInterests(goldPieceFolder)
+		processTouchInterests(crystaltixFolder)
+		processTouchInterests(tixiumFolder)
+		processTouchInterests(drTixiumFolder)
+	end
 
-end
+	-- Initial call to process existing TouchInterests
+	processFolders()
 
--- Initial call to process existing TouchInterests
-processFolders()
-
--- Continuously check and process TouchInterests every 10 seconds
-while true do
-    task.wait(10) -- Adjust the wait time as needed
-    processFolders()
-end
+	-- Continuously check and process TouchInterests every 10 seconds
+	while true do
+		task.wait() -- Adjust the wait time as needed
+		processFolders()
+	end
 
 end)
 
@@ -856,11 +873,13 @@ AddLeaderstats.MouseButton1Down:connect(function()
 	local function updateLeaderstat(player, slotName, currencyName)
 		local tixFactory = player:FindFirstChild("TixFactoryBoardNew")
 		if not tixFactory then
+			warn("TixFactoryBoardNew not found for player: " .. player.Name)
 			return
 		end
 
 		local currencies = tixFactory:FindFirstChild("Currencies")
-		if not currencies then			
+		if not currencies then
+			warn("Currencies not found for player: " .. player.Name)
 			return
 		end
 
@@ -912,16 +931,19 @@ AddLeaderstats.MouseButton1Down:connect(function()
 
 		local tixFactoryBoard = player:FindFirstChild("TixFactoryBoardNew")
 		if not tixFactoryBoard then
+			warn("TixFactoryBoardNew not found for player:", player.Name)
 			return
 		end
 
 		local currencies = tixFactoryBoard:FindFirstChild("Currencies")
 		if not currencies then
+			warn("Currencies not found in TixFactoryBoardNew for player:", player.Name)
 			return
 		end
 
 		local rebornValue = currencies:FindFirstChild("Reborn")
 		if not rebornValue then
+			warn("Reborn value not found in Currencies for player:", player.Name)
 			return
 		end
 
@@ -932,6 +954,7 @@ AddLeaderstats.MouseButton1Down:connect(function()
 	local function setupLocalPlayerLeaderstats()
 		local gui = LocalPlayer.TixFactoryBoardNew:FindFirstChild("Gui")
 		if not gui then
+			warn("Gui not found for LocalPlayer")
 			return
 		end
 
@@ -941,6 +964,7 @@ AddLeaderstats.MouseButton1Down:connect(function()
 				local currencyName = slotValue.Value
 				updateLeaderstat(LocalPlayer, slotName, currencyName)
 			else
+				warn("SlotValue not found: " .. slotName)
 			end
 		end
 
@@ -954,6 +978,7 @@ AddLeaderstats.MouseButton1Down:connect(function()
 		else
 			local gui = LocalPlayer.TixFactoryBoardNew:FindFirstChild("Gui")
 			if not gui then
+				warn("Gui not found for LocalPlayer")
 				return
 			end
 
@@ -963,6 +988,7 @@ AddLeaderstats.MouseButton1Down:connect(function()
 					local currencyName = slotValue.Value
 					updateLeaderstat(player, slotName, currencyName)
 				else
+					warn("SlotValue not found: " .. slotName)
 				end
 			end
 
@@ -1292,6 +1318,39 @@ SpoofPlayer.MouseButton1Down:connect(function()
 	updatePlayerDropDown()
 end)
 
+UnlockTrades.MouseButton1Down:connect(function()
+	-- Get the LocalPlayer
+	local localPlayer = game:GetService("Players").LocalPlayer
+
+	-- Define the paths to the objects
+	local ores1Path = localPlayer.PlayerGui.TixGui.GameUI.Inventory.Trade.Ores1
+	local tix1Path = localPlayer.PlayerGui.TixGui.GameUI.Inventory.Trade.Tix1
+
+	-- Function to make all descendants visible
+	local function makeDescendantsVisible(parent)
+		for _, descendant in pairs(parent:GetDescendants()) do
+			if descendant:IsA("GuiObject") then
+				descendant.Visible = true
+			end
+		end
+	end
+
+	-- Make descendants visible for Ores1
+	if ores1Path then
+		makeDescendantsVisible(ores1Path)
+	else
+		warn("Ores1 path not found")
+	end
+
+	-- Make descendants visible for Tix1
+	if tix1Path then
+		makeDescendantsVisible(tix1Path)
+	else
+		warn("Tix1 path not found")
+	end
+
+end)
+
 InfiniteYield.MouseButton1Down:connect(function()
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
 end)
@@ -1318,9 +1377,9 @@ InstantPP.MouseButton1Down:connect(function()
 	end
 end)
 
---Button Scripts:
+-- Button Scripts:
 
-local function GKJW_fake_script() -- OpenPlayer.OpenScript 
+local function RTXB_fake_script() -- OpenPlayer.OpenScript 
 	local script = Instance.new('LocalScript', OpenPlayer)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -1332,8 +1391,8 @@ local function GKJW_fake_script() -- OpenPlayer.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(GKJW_fake_script)()
-local function WUVP_fake_script() -- MainFrame.Draggable 
+coroutine.wrap(RTXB_fake_script)()
+local function LKIEER_fake_script() -- MainFrame.Draggable 
 	local script = Instance.new('Script', MainFrame)
 
 	local frame = script.Parent
@@ -1343,8 +1402,8 @@ local function WUVP_fake_script() -- MainFrame.Draggable
 	
 	
 end
-coroutine.wrap(WUVP_fake_script)()
-local function DAIBMCX_fake_script() -- OpenAutofarms.OpenScript 
+coroutine.wrap(LKIEER_fake_script)()
+local function BXQI_fake_script() -- OpenAutofarms.OpenScript 
 	local script = Instance.new('LocalScript', OpenAutofarms)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -1356,8 +1415,8 @@ local function DAIBMCX_fake_script() -- OpenAutofarms.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(DAIBMCX_fake_script)()
-local function GVFP_fake_script() -- CloseMenu.OpenScript 
+coroutine.wrap(BXQI_fake_script)()
+local function MWXH_fake_script() -- CloseMenu.OpenScript 
 	local script = Instance.new('LocalScript', CloseMenu)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -1365,8 +1424,8 @@ local function GVFP_fake_script() -- CloseMenu.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(GVFP_fake_script)()
-local function LTWCHTK_fake_script() -- HideMenu.OpenScript 
+coroutine.wrap(MWXH_fake_script)()
+local function DEON_fake_script() -- HideMenu.OpenScript 
 	local script = Instance.new('LocalScript', HideMenu)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -1378,8 +1437,8 @@ local function LTWCHTK_fake_script() -- HideMenu.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(LTWCHTK_fake_script)()
-local function XNTC_fake_script() -- OpenUniversal.OpenScript 
+coroutine.wrap(DEON_fake_script)()
+local function QBXEJP_fake_script() -- OpenUniversal.OpenScript 
 	local script = Instance.new('LocalScript', OpenUniversal)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -1391,8 +1450,8 @@ local function XNTC_fake_script() -- OpenUniversal.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(XNTC_fake_script)()
-local function CNCNTR_fake_script() -- OpenWorld.OpenScript 
+coroutine.wrap(QBXEJP_fake_script)()
+local function UTRTK_fake_script() -- OpenWorld.OpenScript 
 	local script = Instance.new('LocalScript', OpenWorld)
 
 	script.Parent.MouseButton1Click:connect(function()
@@ -1404,4 +1463,4 @@ local function CNCNTR_fake_script() -- OpenWorld.OpenScript
 		wait(0.1)
 	end)
 end
-coroutine.wrap(CNCNTR_fake_script)()
+coroutine.wrap(UTRTK_fake_script)()
