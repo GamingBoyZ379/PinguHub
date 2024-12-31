@@ -136,11 +136,11 @@ ui.init = function(ver)
 	savebtn.TextColor3 = Color3.fromRGB(0, 0, 0)
 	savebtn.TextSize = 14.000
 
-    savebtn.MouseButton1Click:Connect(function()
+       savebtn.MouseButton1Click:Connect(function()
       pcall(function()
-        writefile("grabbed anims.txt", game:GetService("HttpService"):JSONEncode(anims))
-        writefile("grabbed anims.txt", game:GetService("HttpService"):JSONEncode(anims.client))
-        writefile("grabbed anims.txt", game:GetService("HttpService"):JSONEncode(anims.server))
+        writefile("grabbed anims3.txt", game:GetService("HttpService"):JSONEncode(anims))
+        writefile("grabbed anims2.txt", game:GetService("HttpService"):JSONEncode(anims.client))
+        writefile("grabbed anims1.txt", game:GetService("HttpService"):JSONEncode(anims.server))
       end)
     end)
 	local onbd = main
