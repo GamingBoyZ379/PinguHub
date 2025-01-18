@@ -3,7 +3,7 @@ local DiscordLib =
 
 local win = DiscordLib:Window("PinguHub")
 
-local serv = win:Server("Isle", "http://www.roblox.com/asset/?id=4776156106")
+local serv = win:Server("Isle", "")
 
 local btns = serv:Channel("Lobby")
 
@@ -45,5 +45,12 @@ btns:Button(
     "Lounge TP",
     function()
    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-802, 116, -3)
+    end
+)
+
+btns:Button(
+    "Infinite Yield",
+    function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
     end
 )
