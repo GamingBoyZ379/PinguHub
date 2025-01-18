@@ -42,7 +42,7 @@ end
 )
 
 btns:Button(
-    "Get Collectibles",
+    "Lounge TP",
     function()
    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-802, 116, -3)
     end
