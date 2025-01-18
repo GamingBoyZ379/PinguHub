@@ -7,7 +7,6 @@ local serv = win:Server("Isle", "http://www.roblox.com/asset/?id=4776156106")
 
 local btns = serv:Channel("Lobby")
 
--- Add "World" button in the "World" channel
 btns:Button(
     "Get Collectibles",
     function()
@@ -39,5 +38,12 @@ for _, object in pairs(workspace.Map.Ignore.Collectibles:GetDescendants()) do
         end
     end
 end
+    end
+)
+
+btns:Button(
+    "Get Collectibles",
+    function()
+   game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-802, 116, -3)
     end
 )
