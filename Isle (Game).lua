@@ -403,7 +403,7 @@ local btns = serv:Channel("Items")
 btns:Button(
     "Cell Phone (Item TP)",
     function()
-       local function cleanToolName(toolName)
+    local function cleanToolName(toolName)
     return toolName:match("^(.-)#?%d*$") -- Removes everything after "#" and numbers
 end
 
@@ -557,6 +557,22 @@ tool.Activated:Connect(function()
 
     createGUI()
 end)
+
+tool.Unequipped:Connect(function()
+    local gui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("CellPhoneGui")
+    if gui then
+        gui:Destroy()
+    end
+
+    -- Disable lights when the tool is unequipped
+    pointLight.Enabled = false
+    spotlight.Enabled = false
+
+    -- Reset GUI creation flag
+    guiCreated = false
+end)
+
+tool.Parent = game:GetService("Players").LocalPlayer:WaitForChild("Backpack")
     end
 )
 
