@@ -3,9 +3,9 @@ local PlaceScripts = {
     [4620170611] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Break%20In%20(Story)%20GUI.lua',  -- BreakInStory
     [2512643572] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/BGS%20GUI.lua',  -- BubbleGumSimulator
     [15975797635] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Mushroom%20Plumber%20Simulator.lua',  -- MushroomPlumberSimulator
-    [395515963] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/TFT%20GUI.lua' -- TixFactoryTycoon
-    [3431407618] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Isle%20(Game).lua' -- Isle (Game)
-    [3095204897] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Isle%20(Lobby).lua' -- Isle (Lobby)
+    [395515963] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/TFT%20GUI.lua', -- TixFactoryTycoon
+    [3431407618] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Isle%20(Game).lua', -- Isle (Game)
+    [3095204897] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Isle%20(Lobby).lua', -- Isle (Lobby)
     [1234567890] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Isle%20(Orbit).lua' -- Isle (Orbit)
 }
 
