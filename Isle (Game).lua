@@ -90,6 +90,27 @@ game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1191.55
 )
 
 btns:Button(
+    "Disable Parasite Armor",
+    function()
+      game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Map.Ignore.Files.ArmorPlan.CFrame
+task.wait(0.5)  -- Wait for teleport to complete
+fireclickdetector(workspace.Map.Ignore.Files.ArmorPlan.ClickDetector)
+
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Map.Main.HornetContainer.Handle.CFrame
+task.wait(0.5)  -- Wait for teleport to complete
+fireclickdetector(workspace.Map.Main.HornetContainer.Handle.ClickDetector)
+
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Map.Main.LeechContainer.Handle.CFrame
+task.wait(0.5)  -- Wait for teleport to complete
+fireclickdetector(workspace.Map.Main.LeechContainer.Handle.ClickDetector)
+
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Map.Main.FrogContainer.Handle.CFrame
+task.wait(0.5)  -- Wait for teleport to complete
+fireclickdetector(workspace.Map.Main.FrogContainer.Handle.ClickDetector)
+end
+)
+
+btns:Button(
     "Remove Traps",
     function()
        for _, object in pairs(workspace.Map.Ignore.Debris:GetChildren()) do
@@ -403,176 +424,8 @@ local btns = serv:Channel("Items")
 btns:Button(
     "Cell Phone (Item TP)",
     function()
-    local function cleanToolName(toolName)
-    return toolName:match("^(.-)#?%d*$") -- Removes everything after "#" and numbers
-end
-
--- Create the Cell Phone Tool
-local tool = Instance.new("Tool")
-tool.Name = "Cell Phone"
-tool.RequiresHandle = true
-
--- Create the tool handle to resemble a cell phone
-local handle = Instance.new("Part")
-handle.Name = "Handle"
-handle.Size = Vector3.new(1.6, 0.2, 0.8) -- Cell phone shape, vertical
-handle.BrickColor = BrickColor.new("Black") -- Set color to black for metal look
-handle.Anchored = false
-handle.CanCollide = false
-handle.Parent = tool
-
--- Add a PointLight and Spotlight to the handle, soft blue light
-local pointLight = Instance.new("PointLight")
-pointLight.Color = Color3.fromRGB(0, 0, 255) -- Blue light
-pointLight.Range = 10
-pointLight.Brightness = 0.5
-pointLight.Enabled = false -- Initially disabled
-pointLight.Parent = handle
-
-local spotlight = Instance.new("SpotLight")
-spotlight.Color = Color3.fromRGB(0, 0, 255) -- Blue spotlight
-spotlight.Range = 10
-spotlight.Brightness = 0.5
-spotlight.Angle = 45
-spotlight.Enabled = false -- Initially disabled
-spotlight.Parent = handle
-
--- Function to create the GUI
-local guiInstance -- Reference to the GUI
-local guiCreated = false  -- Track if GUI has been created
-
-local function createGUI()
-    -- Avoid creating the GUI more than once
-    if guiCreated then
-        return
-    end
-    guiCreated = true
-
-    local player = game:GetService("Players").LocalPlayer
-    local playerGui = player:WaitForChild("PlayerGui")  -- Ensure PlayerGui is loaded
-
-    -- Create a new GUI
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "CellPhoneGui"
-    screenGui.Parent = playerGui
-
-    -- Cell phone-like scrolling frame for the GUI
-    local scrollingFrame = Instance.new("ScrollingFrame")
-    scrollingFrame.Size = UDim2.new(0.4, 0, 0.5, 0)
-    scrollingFrame.Position = UDim2.new(0.3, 0, 0.3, 0) -- Adjusted to leave space for search bar
-    scrollingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    scrollingFrame.ScrollBarThickness = 8
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0) -- Initial canvas size
-    scrollingFrame.Parent = screenGui
-
-    -- UIListLayout for button arrangement
-    local uiListLayout = Instance.new("UIListLayout")
-    uiListLayout.SortOrder = Enum.SortOrder.Name
-    uiListLayout.Padding = UDim.new(0, 5) -- Add padding between buttons
-    uiListLayout.Parent = scrollingFrame
-
-    -- Create the search bar above the scrolling frame
-    local searchBar = Instance.new("TextBox")
-    searchBar.Size = UDim2.new(0.4, 0, 0, 30) -- Search bar height is 30
-    searchBar.Position = UDim2.new(0.3, 0, 0.25, 0) -- Positioned above the scrolling frame
-    searchBar.PlaceholderText = "Search tools..."
-    searchBar.Text = ""
-    searchBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    searchBar.Parent = screenGui
-
-    -- Filtered tools based on search bar input
-    local tools = {}
-
-    -- Collect tools from workspace
-    for _, item in ipairs(workspace.Map.Ignore.Tools:GetChildren()) do
-        if item:IsA("Model") and item.Name:match("#?%d*$") then
-            table.insert(tools, item)
-        end
-    end
-
-    -- Sort tools alphabetically
-    table.sort(tools, function(a, b)
-        return cleanToolName(a.Name) < cleanToolName(b.Name)
-    end)
-
-    -- Create buttons for each tool
-    local function createToolButton(tool)
-        local cleanName = cleanToolName(tool.Name)
-        local button = Instance.new("TextButton")
-        button.Size = UDim2.new(1, 0, 0, 50) -- Button height is 50
-
-        -- Safely check if PrimaryPart exists
-        local distance = 0
-        if tool.PrimaryPart then
-            distance = (tool.PrimaryPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
-        else
-            warn("Tool '" .. tool.Name .. "' does not have a PrimaryPart.")
-        end
-
-        button.Text = string.format("%s (%.0f studs)", cleanName, distance)
-        button.Parent = scrollingFrame
-
-        button.MouseButton1Click:Connect(function()
-            if tool.PrimaryPart then
-                -- Teleport the player to the tool
-                player.Character:SetPrimaryPartCFrame(tool.PrimaryPart.CFrame)
-
-                -- Remove the button from the GUI after teleporting
-                button:Destroy()
-
-                -- Adjust the canvas size dynamically
-                local totalHeight = #scrollingFrame:GetChildren() * 50 + (#scrollingFrame:GetChildren() - 1) * uiListLayout.Padding.Offset
-                scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-            else
-                warn("No PrimaryPart found for teleporting to tool '" .. tool.Name .. "'.")
-            end
-        end)
-    end
-
-    -- Create initial buttons for all tools
-    for _, tool in ipairs(tools) do
-        createToolButton(tool)
-    end
-
-    -- Filter the tools based on the search bar input
-    searchBar:GetPropertyChangedSignal("Text"):Connect(function()
-        local searchText = searchBar.Text:lower()
-        for _, button in ipairs(scrollingFrame:GetChildren()) do
-            if button:IsA("TextButton") then
-                local toolName = button.Text:lower()
-                button.Visible = toolName:find(searchText, 1, true) ~= nil
-            end
-        end
-    end)
-
-    -- Adjust the canvas size dynamically based on the total button height
-    local totalHeight = #tools * 50 + (#tools - 1) * uiListLayout.Padding.Offset
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-end
-
-tool.Activated:Connect(function()
-    -- Turn on the lights when the tool is activated
-    pointLight.Enabled = true
-    spotlight.Enabled = true
-
-    createGUI()
-end)
-
-tool.Unequipped:Connect(function()
-    local gui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("CellPhoneGui")
-    if gui then
-        gui:Destroy()
-    end
-
-    -- Disable lights when the tool is unequipped
-    pointLight.Enabled = false
-    spotlight.Enabled = false
-
-    -- Reset GUI creation flag
-    guiCreated = false
-end)
-
-tool.Parent = game:GetService("Players").LocalPlayer:WaitForChild("Backpack")
+        local timeOfDay = game:GetService("Lighting").TimeOfDay
+        DiscordLib:Notification("Time", "It is currently " .. timeOfDay, "Okay!")
     end
 )
 
