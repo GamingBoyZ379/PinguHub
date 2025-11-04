@@ -9,9 +9,9 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/GamingBoyZ379/PinguHu
 
 ## Games
 
-🟢 Tix Factory Tycoon - https://www.roblox.com/games/395515963/Tix-Factory-Tycoon-FREE
+🟢 Isle - https://www.roblox.com/games/3095204897/Isle
 
-🟢 Mushroom Plumber Simulator - https://www.roblox.com/games/15975797635/Mushroom-Plumber-Simulator
+🟢 Tix Factory Tycoon - https://www.roblox.com/games/395515963/Tix-Factory-Tycoon-FREE
 
 🟡 Break In (Story) - https://www.roblox.com/games/3851622790/Break-In-Story
 
@@ -20,3 +20,5 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/GamingBoyZ379/PinguHu
 🟡 Bubble Gum Simulator - https://www.roblox.com/games/2512643572/EGG-HUNT-Bubble-Gum-Simulator
 
 🔴 Project Slayers - https://www.roblox.com/games/5956785391/RELEASE-Project-Slayers
+
+🔴 Mushroom Plumber Simulator - https://www.roblox.com/games/15975797635/Mushroom-Plumber-Simulator
