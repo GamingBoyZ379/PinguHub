@@ -841,7 +841,7 @@ local btns = serv:Channel("Endings/Badges")
 btns:Button(
     "The Truth",
     function()
-      -- Step 1: Pre-steps
+ -- Step 1: Grab Revolver
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(473.332703, 162.319366, -1216.36426, 0.994377613, -0.104985408, 0.0138288457, 0.105166622, 0.994368315, -0.0131014287, -0.0123755075, 0.0144821014, 0.999818563)
 task.wait(1)
 keypress(0x45)
@@ -851,6 +851,8 @@ task.wait(0.5)
 
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1771, -195, -1317)
 task.wait(1)
+
+-- Step 2: Artifact D
 
 local camera = game:GetService("Workspace").CurrentCamera
 local player = game:GetService("Players").LocalPlayer
@@ -886,7 +888,7 @@ end
 mouse1click()
 task.wait(1)
 
--- Step 2: Artifact C
+-- Step 3: Artifact C
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-753, 124, -3173)
 task.wait(1)
 keypress(0x45)
@@ -902,8 +904,32 @@ end
 mouse1click()
 task.wait(1)
 
--- Step 3: Artifact A
+-- Step 4: Artifact A
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1361, -455, -1570)
+
+if revolver then
+    player.Character:WaitForChild("Humanoid"):EquipTool(revolver)
+end
+
+task.wait(2)
+
+camera.CameraType = Enum.CameraType.Scriptable
+local cameraPosition = CFrame.new(-1346, -453, -1581)
+local lookAtPosition = CFrame.new(-1346, -453, -1581) * CFrame.new(0, 0, 10)
+camera.CFrame = CFrame.new(cameraPosition.Position, lookAtPosition.Position)
+
+local mouse = game:GetService("Players").LocalPlayer:GetMouse()
+mouse1click()
+task.wait(3)
+mouse1click()
+task.wait(3)
+mouse1click()
+task.wait(3)
+
+camera.CameraType = Enum.CameraType.Custom
+
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1351, -458, -1581)
+
 task.wait(1)
 keypress(0x45)
 task.wait()
@@ -917,7 +943,7 @@ end
 
 mouse1click()
 
--- Step 4: Artifact B
+-- Step 5: Artifact B
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1405, -251, -1854)
 task.wait(1)
 keypress(0x45)
