@@ -424,8 +424,176 @@ local btns = serv:Channel("Items")
 btns:Button(
     "Cell Phone (Item TP)",
     function()
-        local timeOfDay = game:GetService("Lighting").TimeOfDay
-        DiscordLib:Notification("Time", "It is currently " .. timeOfDay, "Okay!")
+      local function cleanToolName(toolName)
+    return toolName:match("^(.-)#?%d*$") -- Removes everything after "#" and numbers
+end
+
+-- Create the Cell Phone Tool
+local tool = Instance.new("Tool")
+tool.Name = "Cell Phone"
+tool.RequiresHandle = true
+
+-- Create the tool handle to resemble a cell phone
+local handle = Instance.new("Part")
+handle.Name = "Handle"
+handle.Size = Vector3.new(1.6, 0.2, 0.8) -- Cell phone shape, vertical
+handle.BrickColor = BrickColor.new("Black") -- Set color to black for metal look
+handle.Anchored = false
+handle.CanCollide = false
+handle.Parent = tool
+
+-- Add a PointLight and Spotlight to the handle, soft blue light
+local pointLight = Instance.new("PointLight")
+pointLight.Color = Color3.fromRGB(0, 0, 255) -- Blue light
+pointLight.Range = 10
+pointLight.Brightness = 0.5
+pointLight.Enabled = false -- Initially disabled
+pointLight.Parent = handle
+
+local spotlight = Instance.new("SpotLight")
+spotlight.Color = Color3.fromRGB(0, 0, 255) -- Blue spotlight
+spotlight.Range = 10
+spotlight.Brightness = 0.5
+spotlight.Angle = 45
+spotlight.Enabled = false -- Initially disabled
+spotlight.Parent = handle
+
+-- Function to create the GUI
+local guiInstance -- Reference to the GUI
+local guiCreated = false  -- Track if GUI has been created
+
+local function createGUI()
+    -- Avoid creating the GUI more than once
+    if guiCreated then
+        return
+    end
+    guiCreated = true
+
+    local player = game:GetService("Players").LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")  -- Ensure PlayerGui is loaded
+
+    -- Create a new GUI
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "CellPhoneGui"
+    screenGui.Parent = playerGui
+
+    -- Cell phone-like scrolling frame for the GUI
+    local scrollingFrame = Instance.new("ScrollingFrame")
+    scrollingFrame.Size = UDim2.new(0.4, 0, 0.5, 0)
+    scrollingFrame.Position = UDim2.new(0.3, 0, 0.3, 0) -- Adjusted to leave space for search bar
+    scrollingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    scrollingFrame.ScrollBarThickness = 8
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0) -- Initial canvas size
+    scrollingFrame.Parent = screenGui
+
+    -- UIListLayout for button arrangement
+    local uiListLayout = Instance.new("UIListLayout")
+    uiListLayout.SortOrder = Enum.SortOrder.Name
+    uiListLayout.Padding = UDim.new(0, 5) -- Add padding between buttons
+    uiListLayout.Parent = scrollingFrame
+
+    -- Create the search bar above the scrolling frame
+    local searchBar = Instance.new("TextBox")
+    searchBar.Size = UDim2.new(0.4, 0, 0, 30) -- Search bar height is 30
+    searchBar.Position = UDim2.new(0.3, 0, 0.25, 0) -- Positioned above the scrolling frame
+    searchBar.PlaceholderText = "Search tools..."
+    searchBar.Text = ""
+    searchBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    searchBar.Parent = screenGui
+
+    -- Filtered tools based on search bar input
+    local tools = {}
+
+    -- Collect tools from workspace
+    for _, item in ipairs(workspace.Map.Ignore.Tools:GetChildren()) do
+        if item:IsA("Model") and item.Name:match("#?%d*$") then
+            table.insert(tools, item)
+        end
+    end
+
+    -- Sort tools alphabetically
+    table.sort(tools, function(a, b)
+        return cleanToolName(a.Name) < cleanToolName(b.Name)
+    end)
+
+    -- Create buttons for each tool
+    local function createToolButton(tool)
+        local cleanName = cleanToolName(tool.Name)
+        local button = Instance.new("TextButton")
+        button.Size = UDim2.new(1, 0, 0, 50) -- Button height is 50
+
+        -- Safely check if PrimaryPart exists
+        local distance = 0
+        if tool.PrimaryPart then
+            distance = (tool.PrimaryPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+        else
+            warn("Tool '" .. tool.Name .. "' does not have a PrimaryPart.")
+        end
+
+        button.Text = string.format("%s (%.0f studs)", cleanName, distance)
+        button.Parent = scrollingFrame
+
+        button.MouseButton1Click:Connect(function()
+            if tool.PrimaryPart then
+                -- Teleport the player to the tool
+                player.Character:SetPrimaryPartCFrame(tool.PrimaryPart.CFrame)
+
+                -- Remove the button from the GUI after teleporting
+                button:Destroy()
+
+                -- Adjust the canvas size dynamically
+                local totalHeight = #scrollingFrame:GetChildren() * 50 + (#scrollingFrame:GetChildren() - 1) * uiListLayout.Padding.Offset
+                scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+            else
+                warn("No PrimaryPart found for teleporting to tool '" .. tool.Name .. "'.")
+            end
+        end)
+    end
+
+    -- Create initial buttons for all tools
+    for _, tool in ipairs(tools) do
+        createToolButton(tool)
+    end
+
+    -- Filter the tools based on the search bar input
+    searchBar:GetPropertyChangedSignal("Text"):Connect(function()
+        local searchText = searchBar.Text:lower()
+        for _, button in ipairs(scrollingFrame:GetChildren()) do
+            if button:IsA("TextButton") then
+                local toolName = button.Text:lower()
+                button.Visible = toolName:find(searchText, 1, true) ~= nil
+            end
+        end
+    end)
+
+    -- Adjust the canvas size dynamically based on the total button height
+    local totalHeight = #tools * 50 + (#tools - 1) * uiListLayout.Padding.Offset
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+end
+
+tool.Activated:Connect(function()
+    -- Turn on the lights when the tool is activated
+    pointLight.Enabled = true
+    spotlight.Enabled = true
+
+    createGUI()
+end)
+
+tool.Unequipped:Connect(function()
+    local gui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("CellPhoneGui")
+    if gui then
+        gui:Destroy()
+    end
+
+    -- Disable lights when the tool is unequipped
+    pointLight.Enabled = false
+    spotlight.Enabled = false
+
+    -- Reset GUI creation flag
+    guiCreated = false
+end)
+
+tool.Parent = game:GetService("Players").LocalPlayer:WaitForChild("Backpack")
     end
 )
 
@@ -497,7 +665,7 @@ end
 btns:Button(
     "Collect Artifacts",
     function()
--- Step 1: Pre-steps
+-- Step 1: Grab Revolver
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(473.332703, 162.319366, -1216.36426, 0.994377613, -0.104985408, 0.0138288457, 0.105166622, 0.994368315, -0.0131014287, -0.0123755075, 0.0144821014, 0.999818563)
 task.wait(1)
 keypress(0x45)
@@ -507,6 +675,8 @@ task.wait(0.5)
 
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1771, -195, -1317)
 task.wait(1)
+
+-- Step 2: Artifact D
 
 local camera = game:GetService("Workspace").CurrentCamera
 local player = game:GetService("Players").LocalPlayer
@@ -542,7 +712,7 @@ end
 mouse1click()
 task.wait(1)
 
--- Step 2: Artifact C
+-- Step 3: Artifact C
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-753, 124, -3173)
 task.wait(1)
 keypress(0x45)
@@ -558,8 +728,32 @@ end
 mouse1click()
 task.wait(1)
 
--- Step 3: Artifact A
+-- Step 4: Artifact A
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1361, -455, -1570)
+
+if revolver then
+    player.Character:WaitForChild("Humanoid"):EquipTool(revolver)
+end
+
+task.wait(2)
+
+camera.CameraType = Enum.CameraType.Scriptable
+local cameraPosition = CFrame.new(-1346, -453, -1581)
+local lookAtPosition = CFrame.new(-1346, -453, -1581) * CFrame.new(0, 0, 10)
+camera.CFrame = CFrame.new(cameraPosition.Position, lookAtPosition.Position)
+
+local mouse = game:GetService("Players").LocalPlayer:GetMouse()
+mouse1click()
+task.wait(3)
+mouse1click()
+task.wait(3)
+mouse1click()
+task.wait(3)
+
+camera.CameraType = Enum.CameraType.Custom
+
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1351, -458, -1581)
+
 task.wait(1)
 keypress(0x45)
 task.wait()
@@ -573,7 +767,7 @@ end
 
 mouse1click()
 
--- Step 4: Artifact B
+-- Step 5: Artifact B
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1405, -251, -1854)
 task.wait(1)
 keypress(0x45)
