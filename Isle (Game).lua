@@ -748,7 +748,7 @@ task.wait(3)
 mouse1click()
 task.wait(3)
 mouse1click()
-task.wait(3)
+task.wait(2)
 
 camera.CameraType = Enum.CameraType.Custom
 
@@ -924,7 +924,7 @@ task.wait(3)
 mouse1click()
 task.wait(3)
 mouse1click()
-task.wait(3)
+task.wait(2)
 
 camera.CameraType = Enum.CameraType.Custom
 
@@ -958,7 +958,9 @@ end
 
 mouse1click()
 task.wait()
-game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2565, -832, -470)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2570, -830, -480)
+task.wait(8)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2570, -830, -480)
     end
 )
 
