@@ -763,18 +763,38 @@ end)
 local creditsChannel = serv:Channel("Made By pengus3npai")
 
 creditsChannel:Button("Join Discord Server", function()
-    local invite = "https://discord.gg/GN6s5uctZM"
+    local invite = "GN6s5uctZM" -- invite CODE only
 
-    -- Copy to clipboard
-    setclipboard(invite)
+    setclipboard("https://discord.gg/" .. invite)
 
-    -- Try opening the invite automatically
+    local http = game:GetService("HttpService")
+
+    local payload = {
+        cmd = "INVITE_BROWSER",
+        args = { code = invite },
+        nonce = http:GenerateGUID(false)
+    }
+
     if syn and syn.request then
-        syn.request({ Url = invite, Method = "GET" })
+        syn.request({
+            Url = "http://127.0.0.1:6463/rpc?v=1",
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json",
+                ["Origin"] = "https://discord.com"
+            },
+            Body = http:JSONEncode(payload)
+        })
     elseif request then
-        request({ Url = invite, Method = "GET" })
-    elseif http and http.request then
-        http.request({ Url = invite, Method = "GET" })
+        request({
+            Url = "http://127.0.0.1:6463/rpc?v=1",
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json",
+                ["Origin"] = "https://discord.com"
+            },
+            Body = http:JSONEncode(payload)
+        })
     end
 end)
 
