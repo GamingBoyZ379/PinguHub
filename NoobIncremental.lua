@@ -334,7 +334,7 @@ local function moveTo(cframe, aliveCheckFn)
     end
 end
 -- ==========================================================
--- Settings
+-- Settings (placed above AutoOres)
 -- ==========================================================
 local settingsChannel = serv:Channel("Settings")
 
@@ -832,6 +832,274 @@ itemsChannel:Toggle("Auto Use T2 Chest", false, function(state)
 end)
 
 -- ==========================================================
+-- Misc
+-- ==========================================================
+local miscChannel = serv:Channel("Misc")
+
+miscChannel:Button("Ancient Fragment Viewer", function()
+    -- Ancient Fragment Viewer UI
+    local Players = game:GetService("Players")
+    local UserInputService = game:GetService("UserInputService")
+
+    local localPlayer = Players.LocalPlayer
+    local playerRows = {}
+    local valueConnections = {}
+
+    local function getFragmentValueObject(player)
+        local currencies = player:FindFirstChild("CURRENCIES")
+        if not currencies then return nil end
+
+        local fragment = currencies:FindFirstChild("AncientFragment")
+        if not fragment then return nil end
+
+        local amount = fragment:FindFirstChild("Amount")
+        if not amount then return nil end
+
+        return amount:FindFirstChild("1")
+    end
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "AncientFragmentTrackerUI"
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = localPlayer:WaitForChild("PlayerGui")
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Name = "MainFrame"
+    mainFrame.Size = UDim2.new(0, 260, 0, 300)
+    mainFrame.Position = UDim2.new(0, 100, 0, 100)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0, 8)
+    uiCorner.Parent = mainFrame
+
+    local titleBar = Instance.new("Frame")
+    titleBar.Name = "TitleBar"
+    titleBar.Size = UDim2.new(1, 0, 0, 32)
+    titleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    titleBar.BorderSizePixel = 0
+    titleBar.Parent = mainFrame
+
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 8)
+    titleCorner.Parent = titleBar
+
+    local titleBarFix = Instance.new("Frame")
+    titleBarFix.Size = UDim2.new(1, 0, 0, 8)
+    titleBarFix.Position = UDim2.new(0, 0, 1, -8)
+    titleBarFix.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    titleBarFix.BorderSizePixel = 0
+    titleBarFix.Parent = titleBar
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, -70, 1, 0)
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "Ancient Fragments"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 14
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = titleBar
+
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Name = "MinimizeButton"
+    minimizeButton.Size = UDim2.new(0, 28, 0, 24)
+    minimizeButton.Position = UDim2.new(1, -34, 0, 4)
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    minimizeButton.Text = "_"
+    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeButton.Font = Enum.Font.GothamBold
+    minimizeButton.TextSize = 16
+    minimizeButton.Parent = titleBar
+
+    local minBtnCorner = Instance.new("UICorner")
+    minBtnCorner.CornerRadius = UDim.new(0, 6)
+    minBtnCorner.Parent = minimizeButton
+
+    local contentFrame = Instance.new("Frame")
+    contentFrame.Name = "ContentFrame"
+    contentFrame.Size = UDim2.new(1, 0, 1, -32)
+    contentFrame.Position = UDim2.new(0, 0, 0, 32)
+    contentFrame.BackgroundTransparency = 1
+    contentFrame.Parent = mainFrame
+
+    local headerFrame = Instance.new("Frame")
+    headerFrame.Size = UDim2.new(1, -16, 0, 24)
+    headerFrame.Position = UDim2.new(0, 8, 0, 6)
+    headerFrame.BackgroundTransparency = 1
+    headerFrame.Parent = contentFrame
+
+    local headerName = Instance.new("TextLabel")
+    headerName.Size = UDim2.new(0.65, 0, 1, 0)
+    headerName.BackgroundTransparency = 1
+    headerName.Text = "Player"
+    headerName.TextColor3 = Color3.fromRGB(180, 180, 180)
+    headerName.Font = Enum.Font.GothamBold
+    headerName.TextSize = 12
+    headerName.TextXAlignment = Enum.TextXAlignment.Left
+    headerName.Parent = headerFrame
+
+    local headerCount = Instance.new("TextLabel")
+    headerCount.Size = UDim2.new(0.35, 0, 1, 0)
+    headerCount.Position = UDim2.new(0.65, 0, 0, 0)
+    headerCount.BackgroundTransparency = 1
+    headerCount.Text = "Fragments"
+    headerCount.TextColor3 = Color3.fromRGB(180, 180, 180)
+    headerCount.Font = Enum.Font.GothamBold
+    headerCount.TextSize = 12
+    headerCount.TextXAlignment = Enum.TextXAlignment.Right
+    headerCount.Parent = headerFrame
+
+    local scrollFrame = Instance.new("ScrollingFrame")
+    scrollFrame.Name = "PlayerList"
+    scrollFrame.Size = UDim2.new(1, -16, 1, -40)
+    scrollFrame.Position = UDim2.new(0, 8, 0, 34)
+    scrollFrame.BackgroundTransparency = 1
+    scrollFrame.BorderSizePixel = 0
+    scrollFrame.ScrollBarThickness = 6
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    scrollFrame.Parent = contentFrame
+
+    local listLayout = Instance.new("UIListLayout")
+    listLayout.Padding = UDim.new(0, 4)
+    listLayout.SortOrder = Enum.SortOrder.Name
+    listLayout.Parent = scrollFrame
+
+    local function setCountText(player, text)
+        local row = playerRows[player]
+        if row then
+            row.countLabel.Text = text
+        end
+    end
+
+    local function watchFragmentValue(player)
+        if valueConnections[player] then
+            valueConnections[player]:Disconnect()
+            valueConnections[player] = nil
+        end
+
+        local valueObj = getFragmentValueObject(player)
+        if valueObj then
+            setCountText(player, tostring(valueObj.Value))
+            valueConnections[player] = valueObj.Changed:Connect(function(newValue)
+                setCountText(player, tostring(newValue))
+            end)
+        else
+            setCountText(player, "N/A")
+        end
+    end
+
+    local function createPlayerRow(player)
+        local row = Instance.new("Frame")
+        row.Name = player.Name
+        row.Size = UDim2.new(1, 0, 0, 28)
+        row.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+        row.Parent = scrollFrame
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 6)
+        corner.Parent = row
+
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Size = UDim2.new(0.65, -8, 1, 0)
+        nameLabel.Position = UDim2.new(0, 8, 0, 0)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Text = player.Name
+        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLabel.Font = Enum.Font.Gotham
+        nameLabel.TextSize = 13
+        nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+        nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+        nameLabel.Parent = row
+
+        local countLabel = Instance.new("TextLabel")
+        countLabel.Size = UDim2.new(0.35, -8, 1, 0)
+        countLabel.Position = UDim2.new(0.65, 0, 0, 0)
+        countLabel.BackgroundTransparency = 1
+        countLabel.Text = "..."
+        countLabel.TextColor3 = Color3.fromRGB(0, 220, 100)
+        countLabel.Font = Enum.Font.GothamBold
+        countLabel.TextSize = 13
+        countLabel.TextXAlignment = Enum.TextXAlignment.Right
+        countLabel.Parent = row
+
+        playerRows[player] = { frame = row, countLabel = countLabel }
+
+        task.spawn(function()
+            for _ = 1, 10 do
+                if getFragmentValueObject(player) then break end
+                task.wait(1)
+            end
+            watchFragmentValue(player)
+        end)
+    end
+
+    local function removePlayerRow(player)
+        local row = playerRows[player]
+        if row then
+            row.frame:Destroy()
+            playerRows[player] = nil
+        end
+        if valueConnections[player] then
+            valueConnections[player]:Disconnect()
+            valueConnections[player] = nil
+        end
+    end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        createPlayerRow(player)
+    end
+
+    Players.PlayerAdded:Connect(createPlayerRow)
+    Players.PlayerRemoving:Connect(removePlayerRow)
+
+    local minimized = false
+    minimizeButton.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        contentFrame.Visible = not minimized
+        if minimized then
+            mainFrame.Size = UDim2.new(0, 260, 0, 32)
+            minimizeButton.Text = "+"
+        else
+            mainFrame.Size = UDim2.new(0, 260, 0, 300)
+            minimizeButton.Text = "_"
+        end
+    end)
+
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    titleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            mainFrame.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end)
+
+-- ==========================================================
 -- Credits
 -- ==========================================================
 local creditsChannel = serv:Channel("Made By pengus3npai")
@@ -871,6 +1139,9 @@ creditsChannel:Button("Join Discord Server", function()
     end
 end)
 
+-- ==========================================================
+-- Dropdown Wiring
+-- ==========================================================
 refreshOreList()
 refreshMobList()
 refreshCapsuleList()
