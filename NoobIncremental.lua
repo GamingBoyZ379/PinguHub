@@ -518,19 +518,21 @@ autoMobsChannel:Toggle("Auto Trial", false, function(state)
                 local mobsFolder = trialRoom and trialRoom:FindFirstChild("Mobs")
 
                 local timeLeft = RS.TrialsStatus[SelectedTrialDifficulty].TimeLeft
-				local NextOpen = RS.TrialsStatus.NextOpenIn
 
                 if timeLeft.Value > 0 and timeLeft.Value <= 900 then
-   				 leaveTrial()
-    			 task.wait(2)
-   				 break
-			end
-
+                    leaveTrial()
+                    task.wait(2)
+                    break
+                end
 
                 if mobsFolder then
                     while autoTrialOn and TrialActive do
                         updateAutoPauseState()
 
+                        while autoTrialOn and TrialActive and mobsFolder and #mobsFolder:GetChildren() == 0 do
+                            task.wait(0.1)
+                        end
+								
                         local targetMob = nil
                         for _, mob in ipairs(mobsFolder:GetChildren()) do
                             if mob:IsA("Model") then
@@ -539,25 +541,32 @@ autoMobsChannel:Toggle("Auto Trial", false, function(state)
                             end
                         end
 
-                        if targetMob then
-                            local cf = getTargetCFrame(targetMob)
-                            if cf then
-                                movementCancelled = false
+                        if not targetMob then
+                            waitForNextWave(mobsFolder)
+                            continue
+                        end
 
-                                if MovementMode == "Legit" then
-                                    moveTo(cf)
-                                else
-                                    moveTo(cf, function() return isMobAlive(targetMob) end)
-                                end
+                        local cf = getTargetCFrame(targetMob)
+                        if cf then
+                            movementCancelled = false
 
-                                if MovementMode ~= "Legit" then
-                                    while autoTrialOn and TrialActive and isMobAlive(targetMob) do
-                                        task.wait(0.05)
-                                    end
+                            if MovementMode == "Legit" then
+                                moveTo(cf)
+                            else
+                                moveTo(cf, function()
+                                    return targetMob and isMobAlive(targetMob)
+                                end)
+                            end
+
+                            if MovementMode ~= "Legit" then
+                                while autoTrialOn
+                                    and TrialActive
+                                    and targetMob
+                                    and isMobAlive(targetMob)
+                                do
+                                    task.wait(0.05)
                                 end
                             end
-                        else
-                            waitForNextWave(mobsFolder)
                         end
                     end
                 end
