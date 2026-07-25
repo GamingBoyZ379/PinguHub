@@ -308,6 +308,53 @@ settingsChannel:Dropdown(
     function(selected) MovementMode = selected end
 )
 
+local hideRollsOn = false
+
+settingsChannel:Toggle("Hide Rolls", false, function(state)
+    hideRollsOn = state
+
+    task.spawn(function()
+        while hideRollsOn do
+            local pg = Players.LocalPlayer.PlayerGui
+
+            -- Force HUD to stay enabled every frame
+            local hud = pg:FindFirstChild("HUD")
+            if hud then
+                hud.Enabled = true
+            end
+
+            -- Hide roll containers in ALL Animations GUIs
+            for _, gui in ipairs(pg:GetChildren()) do
+                if gui:IsA("ScreenGui") and gui.Name == "Animations" then
+                    local main = gui:FindFirstChild("Main")
+                    if main then
+                        local container = main:FindFirstChild("Container")
+                        if container then
+                            container.Visible = false
+                        end
+                    end
+                end
+            end
+
+            task.wait(0.05) -- spam fast enough to override game scripts
+        end
+
+        -- When toggle is OFF, restore containers
+        local pg = Players.LocalPlayer.PlayerGui
+        for _, gui in ipairs(pg:GetChildren()) do
+            if gui:IsA("ScreenGui") and gui.Name == "Animations" then
+                local main = gui:FindFirstChild("Main")
+                if main then
+                    local container = main:FindFirstChild("Container")
+                    if container then
+                        container.Visible = true
+                    end
+                end
+            end
+        end
+    end)
+end)
+
 -- ==========================================================
 -- Auto Ores
 -- ==========================================================
@@ -648,6 +695,64 @@ autoRunesChannel:Toggle("Autoroll", false, function(state)
             end
 
             task.wait(1)
+        end
+    end)
+end)
+
+-- ==========================================================
+-- Items
+-- ==========================================================
+local itemsChannel = serv:Channel("Items")
+
+local autoT1ChestOn = false
+local autoT2ChestOn = false
+
+itemsChannel:Toggle("Auto Use T1 Chest", false, function(state)
+    autoT1ChestOn = state
+    if not state then return end
+
+    task.spawn(function()
+        while autoT1ChestOn do
+            updateAutoPauseState()
+            if AutosPaused then
+                task.wait(0.5)
+                continue
+            end
+
+            local Net = RS:FindFirstChild("__Net")
+            if Net then
+                local Event = Net:FindFirstChild("MainRemote")
+                if Event then
+                    Event:FireServer("OpenChest", "T1TrialChest", 100)
+                end
+            end
+
+            task.wait(2)
+        end
+    end)
+end)
+
+itemsChannel:Toggle("Auto Use T2 Chest", false, function(state)
+    autoT2ChestOn = state
+    if not state then return end
+
+    task.spawn(function()
+        while autoT2ChestOn do
+            updateAutoPauseState()
+            if AutosPaused then
+                task.wait(0.5)
+                continue
+            end
+
+            local Net = RS:FindFirstChild("__Net")
+            if Net then
+                local Event = Net:FindFirstChild("MainRemote")
+                if Event then
+                    Event:FireServer("OpenChest", "T2TrialChest", 100)
+                end
+            end
+
+            task.wait(2)
         end
     end)
 end)
