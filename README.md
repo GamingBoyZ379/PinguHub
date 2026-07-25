@@ -13,6 +13,8 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/GamingBoyZ379/PinguHu
 
 🟢 Tix Factory Tycoon - https://www.roblox.com/games/395515963/Tix-Factory-Tycoon-FREE
 
+🟢 Noob Incremental - https://www.roblox.com/games/76911729991355/Noob-Incremental
+
 🟡 Break In (Story) - https://www.roblox.com/games/3851622790/Break-In-Story
 
 🟡 Blood Moon Tycoon - https://www.roblox.com/games/961409234/Blood-Moon-Tycoon
