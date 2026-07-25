@@ -757,6 +757,16 @@ itemsChannel:Toggle("Auto Use T2 Chest", false, function(state)
     end)
 end)
 
+-- ==========================================================
+-- Credits
+-- ==========================================================
+local creditsChannel = serv:Channel("Made By pengus3npai")
+
+creditsChannel:Button("Copy Discord Server", function()
+    setclipboard("https://discord.gg/GN6s5uctZM")
+end)
+
+
 refreshOreList()
 refreshMobList()
 refreshCapsuleList()
