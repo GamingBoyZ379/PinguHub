@@ -2,7 +2,8 @@
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
--- Create a quick loading frame
+
+-- Loading Frame
 local loadingFrame = Instance.new("ScreenGui")
 loadingFrame.Name = "LoadingFrame"
 loadingFrame.ResetOnSpawn = false
@@ -18,7 +19,6 @@ textLabel.Font = Enum.Font.SourceSansBold
 textLabel.Text = "Loading..."
 textLabel.Parent = loadingFrame
 
--- Fade in/out while waiting
 textLabel.TextTransparency = 1
 for i = 1, 10 do
     textLabel.TextTransparency = 1 - i * 0.1
@@ -45,9 +45,7 @@ local LocalPlayer = Players.LocalPlayer
 local RS = game:GetService("ReplicatedStorage")
 local GameContent = workspace:WaitForChild("__GAME_CONTENT")
 
--- ==========================================================
--- Shared state
--- ==========================================================
+-- Shared State
 local MovementMode = "Teleport"
 local SelectedTrialDifficulty = "Easy"
 local SelectedMob = nil
@@ -65,6 +63,7 @@ local autoRollOn = false
 
 local TrialActive = false
 local AutosPaused = false
+local movementCancelled = false
 
 local OreList = {}
 local MobList = {}
@@ -72,15 +71,12 @@ local capsuleOptions = {}
 local capsuleDisplayMap = {}
 local runeOptions = {}
 
--- Dropdown objects
 local oreDropdown
 local mobDropdown
 local capsuleDropdown
 local runeDropdown
 
--- ==========================================================
 -- Trial State
--- ==========================================================
 local function isPlayerInTrial()
     local hud = LocalPlayer.PlayerGui:FindFirstChild("HUD")
     local leaveButton = hud and hud:FindFirstChild("LeaveTrial")
@@ -92,9 +88,7 @@ local function updateAutoPauseState()
     AutosPaused = TrialActive
 end
 
--- ==========================================================
--- Refresh Logic 
--- ==========================================================
+-- Refresh Lists
 local function refreshOreList()
     local oresFolder = GameContent:FindFirstChild("Ores")
     if not oresFolder then return end
@@ -160,9 +154,7 @@ local function refreshRuneList()
     runeOptions = options
 end
 
--- ==========================================================
 -- Helpers
--- ==========================================================
 local function getRoot()
     local char = LocalPlayer.Character
     return char and char:FindFirstChild("HumanoidRootPart")
@@ -203,7 +195,6 @@ local function leaveTrial()
     end
 end
 
-
 local function getTargetCFrame(obj)
     if obj:IsA("Model") then
         local specificPart = obj:FindFirstChild("TouchPart") or obj:FindFirstChild("Handle")
@@ -226,77 +217,122 @@ local function waitForNextWave(mobsFolder)
     while #mobsFolder:GetChildren() > 0 do task.wait(0.1) end
     while #mobsFolder:GetChildren() == 0 do task.wait(0.1) end
 end
-
 -- ==========================================================
 -- Movement
 -- ==========================================================
+
+local function legitDelay()
+    if MovementMode == "Legit" then
+        task.wait(0.1)
+    end
+end
+
 local function moveTo(cframe, aliveCheckFn)
+    movementCancelled = false
+
     local root = getRoot()
     local character = LocalPlayer.Character
     local humanoid = character and character:FindFirstChild("Humanoid")
     if not root or not humanoid then return end
+    if not cframe then return end
 
+    if AutosPaused then return end
+
+    -- Teleport
     if MovementMode == "Teleport" then
-        root.CFrame = cframe
+        if not movementCancelled then
+            root.CFrame = cframe
+        end
+        return
+    end
 
-    elseif MovementMode == "Tween" then
+    -- Tween
+    if MovementMode == "Tween" then
         local TweenService = game:GetService("TweenService")
         local distance = (root.Position - cframe.Position).Magnitude
-        local tween = TweenService:Create(root, TweenInfo.new(distance / 60, Enum.EasingStyle.Linear), {CFrame = cframe})
+
+        local tween = TweenService:Create(
+            root,
+            TweenInfo.new(distance / 60, Enum.EasingStyle.Linear),
+            { CFrame = cframe }
+        )
+
         tween:Play()
 
         while tween.PlaybackState == Enum.PlaybackState.Playing do
-            if aliveCheckFn and not aliveCheckFn() then tween:Cancel() return end
-            task.wait(0.1)
-        end
-
-    elseif MovementMode == "Walk" or MovementMode == "Legit" then
-        local safeCF = cframe
-        local startPos = root.Position
-        local targetPos = safeCF.Position
-
-        humanoid:MoveTo(targetPos)
-
-        local reached = false
-        local stuckTimer = 0
-        local lastPos = startPos
-
-        local connection = humanoid.MoveToFinished:Connect(function() reached = true end)
-
-        while not reached do
-            task.wait(0.1)
-
-            if MovementMode == "Walk" and aliveCheckFn and not aliveCheckFn() then
-                connection:Disconnect()
+            if movementCancelled or AutosPaused then
+                tween:Cancel()
                 return
             end
 
-            local currentPos = root.Position
-            local distMoved = (currentPos - lastPos).Magnitude
-            lastPos = currentPos
-
-            if distMoved < 0.05 then stuckTimer += 0.1 else stuckTimer = 0 end
-
-            -- Jump assist when stuck
-            if stuckTimer > 0.6 then
-                root.CFrame = root.CFrame + Vector3.new(0, 0.2, 0)
-                humanoid.Jump = true
-                humanoid:MoveTo(targetPos)
-                stuckTimer = 0
+            if MovementMode ~= "Legit" and aliveCheckFn and not aliveCheckFn() then
+                tween:Cancel()
+                return
             end
 
-            -- Super stuck recovery
-            if (currentPos - startPos).Magnitude < 1 and stuckTimer > 1.2 then
-                humanoid.Jump = true
-                root.CFrame = safeCF + Vector3.new(0, 0.3, 0)
-                break
-            end
+            task.wait(0.05)
         end
 
-        connection:Disconnect()
+        if MovementMode == "Legit" then
+            legitDelay()
+        end
+
+        return
+    end
+
+    -- Walk / Legit
+    local targetPos = cframe.Position
+    humanoid:MoveTo(targetPos)
+
+    local reached = false
+    local connection = humanoid.MoveToFinished:Connect(function()
+        reached = true
+    end)
+
+    local lastPos = root.Position
+    local stuckTimer = 0
+
+    while not reached do
+        task.wait(0.05)
+
+        if movementCancelled or AutosPaused then
+            connection:Disconnect()
+            return
+        end
+
+        if MovementMode ~= "Legit" and aliveCheckFn and not aliveCheckFn() then
+            connection:Disconnect()
+            return
+        end
+
+        local currentPos = root.Position
+        local distMoved = (currentPos - lastPos).Magnitude
+        lastPos = currentPos
+
+        if distMoved < 0.05 then
+            stuckTimer += 0.05
+        else
+            stuckTimer = 0
+        end
+
+        if stuckTimer > 0.6 then
+            humanoid.Jump = true
+            humanoid:MoveTo(targetPos)
+            stuckTimer = 0
+        end
+
+        if stuckTimer > 1.2 then
+            root.CFrame = cframe + Vector3.new(0, 0.3, 0)
+            break
+        end
+    end
+
+    connection:Disconnect()
+
+    if MovementMode == "Legit" then
+        legitDelay()
     end
 end
-
 -- ==========================================================
 -- Settings
 -- ==========================================================
@@ -305,7 +341,9 @@ local settingsChannel = serv:Channel("Settings")
 settingsChannel:Dropdown(
     "Movement Mode",
     { "Teleport", "Tween", "Walk", "Legit" },
-    function(selected) MovementMode = selected end
+    function(selected)
+        MovementMode = selected
+    end
 )
 
 local hideRollsOn = false
@@ -316,39 +354,29 @@ settingsChannel:Toggle("Hide Rolls", false, function(state)
     task.spawn(function()
         while hideRollsOn do
             local pg = Players.LocalPlayer.PlayerGui
-
-            -- Force HUD to stay enabled every frame
             local hud = pg:FindFirstChild("HUD")
-            if hud then
-                hud.Enabled = true
-            end
+            if hud then hud.Enabled = true end
 
-            -- Hide roll containers in ALL Animations GUIs
             for _, gui in ipairs(pg:GetChildren()) do
                 if gui:IsA("ScreenGui") and gui.Name == "Animations" then
                     local main = gui:FindFirstChild("Main")
                     if main then
                         local container = main:FindFirstChild("Container")
-                        if container then
-                            container.Visible = false
-                        end
+                        if container then container.Visible = false end
                     end
                 end
             end
 
-            task.wait(0.05) -- spam fast enough to override game scripts
+            task.wait(0.05)
         end
 
-        -- When toggle is OFF, restore containers
         local pg = Players.LocalPlayer.PlayerGui
         for _, gui in ipairs(pg:GetChildren()) do
             if gui:IsA("ScreenGui") and gui.Name == "Animations" then
                 local main = gui:FindFirstChild("Main")
                 if main then
                     local container = main:FindFirstChild("Container")
-                    if container then
-                        container.Visible = true
-                    end
+                    if container then container.Visible = true end
                 end
             end
         end
@@ -362,12 +390,13 @@ local autoOresChannel = serv:Channel("AutoOres")
 
 autoOresChannel:Toggle("Farm All Ores", false, function(state)
     farmAllOresOn = state
+    movementCancelled = not state
     if not state then return end
 
     task.spawn(function()
         while farmAllOresOn do
             updateAutoPauseState()
-            if AutosPaused then task.wait(0.5) continue end
+            if AutosPaused then task.wait(0.3) continue end
 
             local oresFolder = GameContent:FindFirstChild("Ores")
             if oresFolder then
@@ -381,35 +410,45 @@ autoOresChannel:Toggle("Farm All Ores", false, function(state)
                 for _, ore in ipairs(ores) do
                     if not farmAllOresOn then break end
 
-                    local shouldTarget = (MovementMode == "Legit") or isOreAlive(ore)
+                    local shouldTarget =
+                        (MovementMode == "Legit") and true or
+                        isOreAlive(ore)
+
                     if shouldTarget then
                         local cf = getTargetCFrame(ore)
                         if cf then
+                            movementCancelled = false
+
                             if MovementMode == "Legit" then
                                 moveTo(cf)
                             else
                                 moveTo(cf, function() return isOreAlive(ore) end)
                             end
 
-                            while farmAllOresOn and isOreAlive(ore) do task.wait(0.1) end
+                            if MovementMode ~= "Legit" then
+                                while farmAllOresOn and isOreAlive(ore) do
+                                    task.wait(0.1)
+                                end
+                            end
                         end
                     end
                 end
             end
 
-            task.wait(0.5)
+            task.wait(0.3)
         end
     end)
 end)
 
 autoOresChannel:Toggle("Farm Selected Ore", false, function(state)
     farmSelectedOreOn = state
+    movementCancelled = not state
     if not state then return end
 
     task.spawn(function()
         while farmSelectedOreOn do
             updateAutoPauseState()
-            if AutosPaused then task.wait(0.5) continue end
+            if AutosPaused then task.wait(0.3) continue end
 
             if SelectedOre then
                 local oresFolder = GameContent:FindFirstChild("Ores")
@@ -419,17 +458,26 @@ autoOresChannel:Toggle("Farm Selected Ore", false, function(state)
 
                         local cleanName = ore.Name:match("^(.-)#?%d*$") or ore.Name
                         if cleanName == SelectedOre then
-                            local shouldTarget = (MovementMode == "Legit") or isOreAlive(ore)
+                            local shouldTarget =
+                                (MovementMode == "Legit") and true or
+                                isOreAlive(ore)
+
                             if shouldTarget then
                                 local cf = getTargetCFrame(ore)
                                 if cf then
+                                    movementCancelled = false
+
                                     if MovementMode == "Legit" then
                                         moveTo(cf)
                                     else
                                         moveTo(cf, function() return isOreAlive(ore) end)
                                     end
 
-                                    while farmSelectedOreOn and isOreAlive(ore) do task.wait(0.1) end
+                                    if MovementMode ~= "Legit" then
+                                        while farmSelectedOreOn and isOreAlive(ore) do
+                                            task.wait(0.1)
+                                        end
+                                    end
                                 end
                             end
                         end
@@ -437,7 +485,7 @@ autoOresChannel:Toggle("Farm Selected Ore", false, function(state)
                 end
             end
 
-            task.wait(0.5)
+            task.wait(0.3)
         end
     end)
 end)
@@ -450,11 +498,14 @@ local autoMobsChannel = serv:Channel("AutoMobs")
 autoMobsChannel:Dropdown(
     "Trial Difficulty",
     { "Hard", "Medium", "Easy" },
-    function(selected) SelectedTrialDifficulty = selected end
+    function(selected)
+        SelectedTrialDifficulty = selected
+    end
 )
 
 autoMobsChannel:Toggle("Auto Trial", false, function(state)
     autoTrialOn = state
+    movementCancelled = not state
     if not state then return end
 
     task.spawn(function()
@@ -464,18 +515,17 @@ autoMobsChannel:Toggle("Auto Trial", false, function(state)
             if TrialActive then
                 local trialsRoot = GameContent:FindFirstChild("Trials")
                 local trialRoom = trialsRoot and trialsRoot:FindFirstChild(SelectedTrialDifficulty .. "TrialRoom")
-
                 local mobsFolder = trialRoom and trialRoom:FindFirstChild("Mobs")
 
-                -- Correct TimeLeft reference
                 local timeLeft = RS.TrialsStatus[SelectedTrialDifficulty].TimeLeft
+				local NextOpen = RS.TrialsStatus.NextOpenIn
 
-                -- Leave trial at <=900 seconds
-                if timeLeft.Value <= 900 then
-                    leaveTrial()
-                    task.wait(2)
-                    break
-                end
+                if timeLeft.Value > 0 and timeLeft.Value <= 900 then
+   				 leaveTrial()
+    			 task.wait(2)
+   				 break
+			end
+
 
                 if mobsFolder then
                     while autoTrialOn and TrialActive do
@@ -483,7 +533,7 @@ autoMobsChannel:Toggle("Auto Trial", false, function(state)
 
                         local targetMob = nil
                         for _, mob in ipairs(mobsFolder:GetChildren()) do
-                            if mob:IsA("Model") and isMobAlive(mob) then
+                            if mob:IsA("Model") then
                                 targetMob = mob
                                 break
                             end
@@ -492,14 +542,18 @@ autoMobsChannel:Toggle("Auto Trial", false, function(state)
                         if targetMob then
                             local cf = getTargetCFrame(targetMob)
                             if cf then
+                                movementCancelled = false
+
                                 if MovementMode == "Legit" then
                                     moveTo(cf)
                                 else
                                     moveTo(cf, function() return isMobAlive(targetMob) end)
                                 end
 
-                                while autoTrialOn and TrialActive and isMobAlive(targetMob) do
-                                    task.wait(0.05)
+                                if MovementMode ~= "Legit" then
+                                    while autoTrialOn and TrialActive and isMobAlive(targetMob) do
+                                        task.wait(0.05)
+                                    end
                                 end
                             end
                         else
@@ -527,6 +581,7 @@ autoMobsChannel:Toggle("Auto Trial", false, function(state)
                         local touchPart = trialModel and trialModel:FindFirstChild("TouchPart")
 
                         if touchPart then
+                            movementCancelled = false
                             moveTo(touchPart.CFrame)
                             task.wait(1)
                         end
@@ -534,19 +589,20 @@ autoMobsChannel:Toggle("Auto Trial", false, function(state)
                 end
             end
 
-            task.wait(0.5)
+            task.wait(0.3)
         end
     end)
 end)
 
 autoMobsChannel:Toggle("Farm All Mobs", false, function(state)
     farmAllOn = state
+    movementCancelled = not state
     if not state then return end
 
     task.spawn(function()
         while farmAllOn do
             updateAutoPauseState()
-            if AutosPaused then task.wait(0.5) continue end
+            if AutosPaused then task.wait(0.3) continue end
 
             local mobsFolder = GameContent:FindFirstChild("Mobs")
             if mobsFolder then
@@ -560,35 +616,45 @@ autoMobsChannel:Toggle("Farm All Mobs", false, function(state)
                 for _, mob in ipairs(mobs) do
                     if not farmAllOn then break end
 
-                    local shouldTarget = (MovementMode == "Legit") or isMobAlive(mob)
+                    local shouldTarget =
+                        (MovementMode == "Legit") and true or
+                        isMobAlive(mob)
+
                     if shouldTarget then
                         local cf = getTargetCFrame(mob)
                         if cf then
+                            movementCancelled = false
+
                             if MovementMode == "Legit" then
                                 moveTo(cf)
                             else
                                 moveTo(cf, function() return isMobAlive(mob) end)
                             end
 
-                            while farmAllOn and isMobAlive(mob) do task.wait(0.1) end
+                            if MovementMode ~= "Legit" then
+                                while farmAllOn and isMobAlive(mob) do
+                                    task.wait(0.1)
+                                end
+                            end
                         end
                     end
                 end
             end
 
-            task.wait(0.5)
+            task.wait(0.3)
         end
     end)
 end)
 
 autoMobsChannel:Toggle("Farm Selected Mobs", false, function(state)
     farmSelectedOn = state
+    movementCancelled = not state
     if not state then return end
 
     task.spawn(function()
         while farmSelectedOn do
             updateAutoPauseState()
-            if AutosPaused then task.wait(0.5) continue end
+            if AutosPaused then task.wait(0.3) continue end
 
             if SelectedMob then
                 local mobsFolder = GameContent:FindFirstChild("Mobs")
@@ -598,10 +664,15 @@ autoMobsChannel:Toggle("Farm Selected Mobs", false, function(state)
 
                         local cleanName = mob.Name:match("^(.-)#?%d*$") or mob.Name
                         if cleanName == SelectedMob then
-                            local shouldTarget = (MovementMode == "Legit") or isMobAlive(mob)
+                            local shouldTarget =
+                                (MovementMode == "Legit") and true or
+                                isMobAlive(mob)
+
                             if shouldTarget then
                                 local cf = getTargetCFrame(mob)
                                 if cf then
+                                    movementCancelled = false
+
                                     if MovementMode == "Legit" then
                                         moveTo(cf)
                                     else
@@ -614,11 +685,10 @@ autoMobsChannel:Toggle("Farm Selected Mobs", false, function(state)
                 end
             end
 
-            task.wait(0.5)
+            task.wait(0.3)
         end
     end)
 end)
-
 -- ==========================================================
 -- Auto Capsules
 -- ==========================================================
@@ -626,15 +696,13 @@ local autoCapsulesChannel = serv:Channel("AutoCapsules")
 
 autoCapsulesChannel:Toggle("Auto Open", false, function(state)
     autoCapsuleOn = state
+    movementCancelled = not state
     if not state then return end
 
     task.spawn(function()
         while autoCapsuleOn do
             updateAutoPauseState()
-            if AutosPaused then
-                task.wait(0.5)
-                continue
-            end
+            if AutosPaused then task.wait(0.3) continue end
 
             if SelectedCapsule then
                 local fullName = capsuleDisplayMap[SelectedCapsule]
@@ -643,14 +711,17 @@ autoCapsulesChannel:Toggle("Auto Open", false, function(state)
 
                 if capsuleObj then
                     local cf = getTargetCFrame(capsuleObj)
-                    local teleported = false
+                    if cf then
+                        movementCancelled = false
 
-                    if cf and isFarEnough(cf, 10) then
-                        moveTo(cf)
-                        teleported = true
-                    end
+                        if isFarEnough(cf, 10) then
+                            if MovementMode == "Legit" then
+                                moveTo(cf)
+                            else
+                                moveTo(cf)
+                            end
+                        end
 
-                    if teleported then
                         local Net = RS:FindFirstChild("__Net")
                         if Net then
                             local Event = Net:FindFirstChild("MainRemote")
@@ -663,11 +734,10 @@ autoCapsulesChannel:Toggle("Auto Open", false, function(state)
                 end
             end
 
-            task.wait(1)
+            task.wait(0.5)
         end
     end)
 end)
-
 
 -- ==========================================================
 -- Auto Runes
@@ -676,25 +746,35 @@ local autoRunesChannel = serv:Channel("AutoRunes")
 
 autoRunesChannel:Toggle("Autoroll", false, function(state)
     autoRollOn = state
+    movementCancelled = not state
     if not state then return end
 
     task.spawn(function()
         while autoRollOn do
             updateAutoPauseState()
-            if AutosPaused then task.wait(0.5) continue end
+            if AutosPaused then task.wait(0.3) continue end
 
             if SelectedRune then
                 local runeZones = GameContent:FindFirstChild("RuneZones")
                 local runeObj = runeZones and runeZones:FindFirstChild(SelectedRune)
+
                 if runeObj then
                     local cf = getTargetCFrame(runeObj)
-                    if cf and isFarEnough(cf, 10) then
-                        moveTo(cf)
+                    if cf then
+                        movementCancelled = false
+
+                        if isFarEnough(cf, 10) then
+                            if MovementMode == "Legit" then
+                                moveTo(cf)
+                            else
+                                moveTo(cf)
+                            end
+                        end
                     end
                 end
             end
 
-            task.wait(1)
+            task.wait(0.5)
         end
     end)
 end)
@@ -714,10 +794,7 @@ itemsChannel:Toggle("Auto Use T1 Chest", false, function(state)
     task.spawn(function()
         while autoT1ChestOn do
             updateAutoPauseState()
-            if AutosPaused then
-                task.wait(0.5)
-                continue
-            end
+            if AutosPaused then task.wait(0.3) continue end
 
             local Net = RS:FindFirstChild("__Net")
             if Net then
@@ -739,10 +816,7 @@ itemsChannel:Toggle("Auto Use T2 Chest", false, function(state)
     task.spawn(function()
         while autoT2ChestOn do
             updateAutoPauseState()
-            if AutosPaused then
-                task.wait(0.5)
-                continue
-            end
+            if AutosPaused then task.wait(0.3) continue end
 
             local Net = RS:FindFirstChild("__Net")
             if Net then
@@ -763,8 +837,7 @@ end)
 local creditsChannel = serv:Channel("Made By pengus3npai")
 
 creditsChannel:Button("Join Discord Server", function()
-    local invite = "GN6s5uctZM" -- invite CODE only
-
+    local invite = "GN6s5uctZM"
     setclipboard("https://discord.gg/" .. invite)
 
     local http = game:GetService("HttpService")
