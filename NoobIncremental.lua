@@ -762,10 +762,21 @@ end)
 -- ==========================================================
 local creditsChannel = serv:Channel("Made By pengus3npai")
 
-creditsChannel:Button("Copy Discord Server", function()
-    setclipboard("https://discord.gg/GN6s5uctZM")
-end)
+creditsChannel:Button("Join Discord Server", function()
+    local invite = "https://discord.gg/GN6s5uctZM"
 
+    -- Copy to clipboard
+    setclipboard(invite)
+
+    -- Try opening the invite automatically
+    if syn and syn.request then
+        syn.request({ Url = invite, Method = "GET" })
+    elseif request then
+        request({ Url = invite, Method = "GET" })
+    elseif http and http.request then
+        http.request({ Url = invite, Method = "GET" })
+    end
+end)
 
 refreshOreList()
 refreshMobList()
