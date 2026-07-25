@@ -7,6 +7,7 @@ local PlaceScripts = {
     [3431407618] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Isle%20(Game).lua', -- Isle (Game)
     [3095204897] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Isle%20(Lobby).lua', -- Isle (Lobby)
     [1234567890] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/PinguHub/Isle%20(Orbit).lua' -- Isle (Orbit)
+    [76911729991355] = 'https://raw.githubusercontent.com/GamingBoyZ379/PinguHub/refs/heads/PinguHub/NoobIncremental.lua' -- NoobIncremental
 }
 
 local messages = {
