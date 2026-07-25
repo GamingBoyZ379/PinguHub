@@ -419,10 +419,10 @@ autoMobsChannel:Toggle("Auto Trial", false, function(state)
                 local mobsFolder = trialRoom and trialRoom:FindFirstChild("Mobs")
 
                 -- Correct TimeLeft reference
-                local timeLeft = RS.TrialsStatus.[SelectedTrialDifficulty].TimeLeft
+                local timeLeft = RS.TrialsStatus[SelectedTrialDifficulty].TimeLeft
 
                 -- Leave trial at <=900 seconds
-                if timeLeft.Value <= 900 then
+                if timeLeft and timeLeft.Value <= 900 then
                     leaveTrial()
                     task.wait(2)
                     break
@@ -678,4 +678,3 @@ runeDropdown = autoRunesChannel:Dropdown(
     runeOptions,
     function(selected) SelectedRune = selected end
 )
-
