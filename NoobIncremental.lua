@@ -197,10 +197,12 @@ local function isOreAlive(ore)
 end
 
 local function leaveTrial()
-    local hud = LocalPlayer.PlayerGui:FindFirstChild("HUD")
-    local leaveButton = hud and hud:FindFirstChild("LeaveTrial")
-    if leaveButton then firesignal(leaveButton.MouseButton1Click) end
+    local Event = RS:FindFirstChild("__Net") and RS.__Net:FindFirstChild("MainRemote")
+    if Event then
+        Event:FireServer("LeaveTrial")
+    end
 end
+
 
 local function getTargetCFrame(obj)
     if obj:IsA("Model") then
