@@ -422,7 +422,7 @@ autoMobsChannel:Toggle("Auto Trial", false, function(state)
                 local timeLeft = RS.TrialsStatus[SelectedTrialDifficulty].TimeLeft
 
                 -- Leave trial at <=900 seconds
-                if timeLeft and timeLeft.Value <= 900 then
+                if timeLeft.Value <= 900 then
                     leaveTrial()
                     task.wait(2)
                     break
