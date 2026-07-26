@@ -973,6 +973,50 @@ UITab:CreateButton({
 })
 
 MiscTab:CreateButton({
+    Name = "Redeem Missing Codes",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local RS = game:GetService("ReplicatedStorage")
+        local Event = RS.__Net.MainRemote
+
+        local localPlayer = Players.LocalPlayer
+        local myCodesFolder = localPlayer:FindFirstChild("EXTRA") and localPlayer.EXTRA:FindFirstChild("CODES")
+        if not myCodesFolder then
+            print("No local CODES folder found.")
+            return
+        end
+
+        -- Build a set of your codes
+        local myCodes = {}
+        for _, codeObj in ipairs(myCodesFolder:GetChildren()) do
+            myCodes[codeObj.Name] = true
+        end
+
+        -- Check other players
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= localPlayer then
+                local extra = player:FindFirstChild("EXTRA")
+                local codesFolder = extra and extra:FindFirstChild("CODES")
+
+                if codesFolder then
+                    for _, codeObj in ipairs(codesFolder:GetChildren()) do
+                        local codeName = codeObj.Name
+
+                        -- If they have a code you don't, redeem it
+                        if not myCodes[codeName] then
+                            print("Redeeming missing code:", codeName)
+                            Event:FireServer("EnterCode", codeName)
+                        end
+                    end
+                end
+            end
+        end
+
+        print("Finished checking and redeeming missing codes.")
+    end
+})
+
+MiscTab:CreateButton({
     Name = "Enable Anti AFK",
     Callback = function()
         local VirtualUser = cloneref(game:GetService("VirtualUser"))
@@ -1039,6 +1083,107 @@ MiscTab:CreateButton({
         print("===== END DEBUG =====")
     end
 })
+
+local streamerModeOn = false
+local spoofSelf = "@PinguHub User"
+local spoofOthers = "@User"
+local originalOverheads = {}
+
+local Players = game:GetService("Players")
+
+local function spoofOverhead(player)
+    if not streamerModeOn then return end
+
+    local spoofName = (player == Players.LocalPlayer) and spoofSelf or spoofOthers
+    local char = player.Character
+    if not char then return end
+
+    local head = char:FindFirstChild("Head")
+    if not head then return end
+
+    local overhead = head:FindFirstChild("OverheadGui")
+    if not overhead then return end
+
+    local frame = overhead:FindFirstChild("Frame")
+    if not frame then return end
+
+    local label = frame:FindFirstChild("Username")
+    if not label then return end
+
+    -- store original once
+    if not originalOverheads[player] then
+        originalOverheads[player] = label.Text
+    end
+
+    label.Text = spoofName
+end
+
+local function revertOverhead(player)
+    local char = player.Character
+    if not char then return end
+
+    local head = char:FindFirstChild("Head")
+    if not head then return end
+
+    local overhead = head:FindFirstChild("OverheadGui")
+    if not overhead then return end
+
+    local frame = overhead:FindFirstChild("Frame")
+    if not frame then return end
+
+    local label = frame:FindFirstChild("Username")
+    if not label then return end
+
+    if originalOverheads[player] then
+        label.Text = originalOverheads[player]
+    end
+end
+
+local function applyAll()
+    for _, p in ipairs(Players:GetPlayers()) do
+        spoofOverhead(p)
+    end
+end
+
+local function revertAll()
+    for _, p in ipairs(Players:GetPlayers()) do
+        revertOverhead(p)
+    end
+end
+
+-- auto-refresh on respawn
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        task.wait(0.2)
+        if streamerModeOn then
+            spoofOverhead(player)
+        end
+    end)
+end)
+
+-- auto-refresh when overhead reloads
+workspace.ChildAdded:Connect(function(obj)
+    if not streamerModeOn then return end
+    local player = Players:GetPlayerFromCharacter(obj)
+    if player then
+        task.wait(0.2)
+        spoofOverhead(player)
+    end
+end)
+
+MiscTab:CreateToggle({
+    Name = "Streamer Mode (Overhead Only)",
+    CurrentValue = false,
+    Callback = function(state)
+        streamerModeOn = state
+        if state then
+            applyAll()
+        else
+            revertAll()
+        end
+    end
+})
+
 
 ---------------------------------------------------------------------
 -- Ancient Fragment Viewer
