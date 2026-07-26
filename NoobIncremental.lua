@@ -357,6 +357,7 @@ SettingsTab:CreateDropdown({
     Name = "Movement Mode",
     Options = { "Teleport", "Tween", "Walk", "Legit" },
     CurrentOption = MovementMode,
+    MultipleOptions = false,
     Callback = function(selected)
         MovementMode = normalizeMode(selected)
     end
@@ -405,6 +406,7 @@ AutoTrialTab:CreateDropdown({
     Name = "Trial Difficulty",
     Options = { "Hard", "Medium", "Easy" },
     CurrentOption = SelectedTrialDifficulty,
+    MultipleOptions = false,
     Callback = function(selected)
         SelectedTrialDifficulty = normalizeMode(selected)
     end
@@ -527,6 +529,7 @@ _G.OreDropdown = AutoOresTab:CreateDropdown({
     Name = "Target Ore",
     Options = OreList,
     CurrentOption = "",
+    MultipleOptions = true,
     Callback = function(selected)
         SelectedOre = normalizeMode(selected)
     end
@@ -673,6 +676,7 @@ _G.MobDropdown = AutoMobsTab:CreateDropdown({
     Name = "Target Mob",
     Options = MobList,
     CurrentOption = "",
+    MultipleOptions = true,
     Callback = function(selected)
         SelectedMob = normalizeMode(selected)
     end
@@ -820,6 +824,7 @@ _G.CapsuleDropdown = AutoCapsulesTab:CreateDropdown({
     Name = "Capsule",
     Options = capsuleOptions,
     CurrentOption = "",
+    MultipleOptions = false,
     Callback = function(selected)
         SelectedCapsule = normalizeMode(selected)
     end
@@ -887,6 +892,7 @@ _G.RuneDropdown = AutoRunesTab:CreateDropdown({
     Name = "Runes",
     Options = runeOptions,
     CurrentOption = "",
+    MultipleOptions = false,
     Callback = function(selected)
         SelectedRune = normalizeMode(selected)
     end
