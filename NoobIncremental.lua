@@ -973,7 +973,7 @@ UITab:CreateButton({
 })
 
 MiscTab:CreateButton({
-    Name = "Redeem Missing Codes",
+    Name = "Redeem Codes (Be in a Server with Others)",
     Callback = function()
         local Players = game:GetService("Players")
         local RS = game:GetService("ReplicatedStorage")
