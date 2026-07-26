@@ -1020,7 +1020,7 @@ MiscTab:CreateButton({
             end
         end)
 
-        print("Finished checking missing codes.")
+        print("Finished checking and redeeming missing codes.")
     end
 })
 
@@ -1192,12 +1192,21 @@ MiscTab:CreateToggle({
     end
 })
 
-
 ---------------------------------------------------------------------
 -- Ancient Fragment Viewer
 ---------------------------------------------------------------------
 local fragSection = MiscTab:CreateSection("Ancient Fragment Viewer")
-local fragLabels = {}
+
+local fragLabels = {}        -- Rayfield label objects
+local lastFragValues = {}    -- saved fragment values
+local Players = game:GetService("Players")
+
+local RayfieldMisc = game:GetService("CoreGui")
+    .RobloxGui.Rayfield.Main.Elements.Misc
+
+---------------------------------------------------------------------
+-- Helpers
+---------------------------------------------------------------------
 
 local function getFragmentValueObject(player)
     local currencies = player:FindFirstChild("CURRENCIES")
@@ -1210,6 +1219,8 @@ local function getFragmentValueObject(player)
 end
 
 local function updateFragmentLabel(player, valueText)
+    lastFragValues[player.UserId] = valueText
+
     local label = fragLabels[player]
     if label then
         label:Set(player.Name .. " — " .. valueText)
@@ -1220,20 +1231,17 @@ local function watchFragmentValue(player)
     task.spawn(function()
         local valueObj
 
-        -- Retry for up to 10 seconds
         for _ = 1, 10 do
             valueObj = getFragmentValueObject(player)
             if valueObj then break end
             task.wait(1)
         end
 
-        -- Still missing? Show N/A
         if not valueObj then
             updateFragmentLabel(player, "N/A")
             return
         end
 
-        -- Found it — update and listen
         updateFragmentLabel(player, tostring(valueObj.Value))
 
         valueObj.Changed:Connect(function(newValue)
@@ -1242,25 +1250,72 @@ local function watchFragmentValue(player)
     end)
 end
 
+---------------------------------------------------------------------
+-- Row creation / removal
+---------------------------------------------------------------------
+
 local function createFragmentRow(player)
     if fragLabels[player] then return end
+
     fragLabels[player] = MiscTab:CreateLabel(player.Name .. " — ...")
     watchFragmentValue(player)
 end
 
-local function removeFragmentRow(player)
-    if fragLabels[player] then
-        fragLabels[player]:Set(player.Name .. " — (left)")
-        fragLabels[player] = nil
-    end
+local function markPlayerLeft(player)
+    local label = fragLabels[player]
+    if not label then return end
+
+    local saved = lastFragValues[player.UserId] or "N/A"
+    label:Set(player.Name .. " — " .. saved .. " (left)")
 end
+
+---------------------------------------------------------------------
+-- Clear Left Players (DESTROY LABEL ELEMENT)
+---------------------------------------------------------------------
+
+MiscTab:CreateButton({
+    Name = "Clear Left Players",
+    Callback = function()
+        for _, element in ipairs(RayfieldMisc:GetChildren()) do
+            local title = element:FindFirstChild("Title")
+            if title and title.Text and title.Text:find("%(left%)") then
+                element:Destroy()  -- destroy the entire label element
+            end
+        end
+
+        -- Clean fragLabels table
+        for player, label in pairs(fragLabels) do
+            local title = label.Title
+            if title and title.Text and title.Text:find("%(left%)") then
+                fragLabels[player] = nil
+            end
+        end
+    end
+})
+
+---------------------------------------------------------------------
+-- Init
+---------------------------------------------------------------------
 
 for _, p in ipairs(Players:GetPlayers()) do
     createFragmentRow(p)
 end
 
-Players.PlayerAdded:Connect(createFragmentRow)
-Players.PlayerRemoving:Connect(removeFragmentRow)
+Players.PlayerAdded:Connect(function(player)
+    -- If they rejoin, remove old left label
+    for _, element in ipairs(RayfieldMisc:GetChildren()) do
+        local title = element:FindFirstChild("Title")
+        if title and title.Text:find(player.Name .. " —") and title.Text:find("%(left%)") then
+            element:Destroy()
+        end
+    end
+
+    fragLabels[player] = nil
+    createFragmentRow(player)
+end)
+
+Players.PlayerRemoving:Connect(markPlayerLeft)
+
 
 ---------------------------------------------------------------------
 -- Credits
