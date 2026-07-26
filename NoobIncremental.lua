@@ -1,4 +1,4 @@
---== NoobIncremental Rayfield Version (Discord Logic Merged) ==--
+--== NoobIncremental Rayfield Version ==--
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
