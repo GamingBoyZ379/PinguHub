@@ -973,7 +973,7 @@ UITab:CreateButton({
 })
 
 MiscTab:CreateButton({
-    Name = "Redeem Codes (Be in a Server with Others)",
+    Name = "Redeem Codes (Be in a server with others)",
     Callback = function()
         local Players = game:GetService("Players")
         local RS = game:GetService("ReplicatedStorage")
@@ -992,7 +992,9 @@ MiscTab:CreateButton({
             myCodes[codeObj.Name] = true
         end
 
-        -- Check other players
+        -- Collect missing codes first
+        local missingCodes = {}
+
         for _, player in ipairs(Players:GetPlayers()) do
             if player ~= localPlayer then
                 local extra = player:FindFirstChild("EXTRA")
@@ -1001,16 +1003,22 @@ MiscTab:CreateButton({
                 if codesFolder then
                     for _, codeObj in ipairs(codesFolder:GetChildren()) do
                         local codeName = codeObj.Name
-
-                        -- If they have a code you don't, redeem it
                         if not myCodes[codeName] then
-                            print("Redeeming missing code:", codeName)
-                            Event:FireServer("EnterCode", codeName)
+                            table.insert(missingCodes, codeName)
                         end
                     end
                 end
             end
         end
+
+        -- Redeem codes with 2s delay
+        task.spawn(function()
+            for _, codeName in ipairs(missingCodes) do
+                print("Redeeming missing code:", codeName)
+                Event:FireServer("EnterCode", codeName)
+                task.wait(2) -- required delay
+            end
+        end)
 
         print("Finished checking and redeeming missing codes.")
     end
