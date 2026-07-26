@@ -1020,7 +1020,7 @@ MiscTab:CreateButton({
             end
         end)
 
-        print("Finished checking and redeeming missing codes.")
+        print("Finished checking missing codes.")
     end
 })
 
