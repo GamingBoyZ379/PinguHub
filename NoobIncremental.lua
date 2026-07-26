@@ -461,7 +461,7 @@ task.spawn(function()
         end
 
         if TrialActive then
-            AutosPaused = true
+            AutosPaused = false
 
             local timeLeft = RS.TrialsStatus[SelectedTrialDifficulty].TimeLeft
             if autoLeaveEnabled and timeLeft.Value > 0 and timeLeft.Value <= leaveTime then
