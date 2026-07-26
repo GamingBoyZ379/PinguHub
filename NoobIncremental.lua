@@ -346,6 +346,7 @@ local AutoCapsulesTab  = Window:CreateTab("AutoCapsules")
 local AutoRunesTab     = Window:CreateTab("AutoRunes")
 local ItemsTab         = Window:CreateTab("Items")
 local UITab			   = Window:CreateTab("UI")
+local TeleportTab 	   = Window:CreateTab("Teleports")
 local MiscTab          = Window:CreateTab("Misc")
 local CreditsTab       = Window:CreateTab("Credits")
 
@@ -1051,6 +1052,49 @@ UITab:CreateButton({
         firesignal(Event.OnClientEvent, "Open", "RuneSacrifice")
     end
 })
+
+local function tpTo(x, y, z)
+    local root = getRoot()
+    if root then
+        root.CFrame = CFrame.new(x, y, z)
+    end
+end
+
+TeleportTab:CreateButton({
+    Name = "Lab",
+    Callback = function()
+        tpTo(-2609, 45, -619)
+    end
+})
+
+TeleportTab:CreateButton({
+    Name = "Realm 1",
+    Callback = function()
+        tpTo(1143, 15, -591)
+    end
+})
+
+TeleportTab:CreateButton({
+    Name = "Realm 2",
+    Callback = function()
+        tpTo(1042, 10, 3288)
+    end
+})
+
+TeleportTab:CreateButton({
+    Name = "Realm 3",
+    Callback = function()
+        tpTo(1019, 10, 7770)
+    end
+})
+
+TeleportTab:CreateButton({
+    Name = "Football",
+    Callback = function()
+        tpTo(-2701, 40, -119)
+    end
+})
+
 
 MiscTab:CreateButton({
     Name = "Redeem Codes (Be in a server with others)",
