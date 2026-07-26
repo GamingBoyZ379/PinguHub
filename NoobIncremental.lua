@@ -1,52 +1,73 @@
---== NoobIncremental Rayfield Version ==--
+--== NoobIncremental Rayfield Version (Optimized) ==--
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local RS = game:GetService("ReplicatedStorage")
-local GameContent = workspace:WaitForChild("__GAME_CONTENT")
+local Players       = game:GetService("Players")
+local LocalPlayer   = Players.LocalPlayer
+local RS            = game:GetService("ReplicatedStorage")
+local TweenService  = game:GetService("TweenService")
+
+local GameContent   = workspace:WaitForChild("__GAME_CONTENT")
+local OresFolder    = GameContent:WaitForChild("Ores")
+local MobsFolder    = GameContent:WaitForChild("Mobs")
+local UIZones       = GameContent:WaitForChild("UIZones")
+local RuneZones     = GameContent:WaitForChild("RuneZones")
+local TrialsRoot    = GameContent:WaitForChild("Trials")
 
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
 task.wait(0.25)
 
+---------------------------------------------------------------------
 -- State
-local MovementMode = "Teleport"
+---------------------------------------------------------------------
+local MovementMode            = "Teleport"
 local SelectedTrialDifficulty = "Easy"
-local SelectedMob = nil
-local SelectedOre = nil
-local SelectedCapsule = nil
-local SelectedRune = nil
+local SelectedMob             = nil
+local SelectedOre             = nil
+local SelectedCapsule         = nil
+local SelectedRune            = nil
 
-local autoTrialOn = false
-local farmAllOn = false
-local farmSelectedOn = false
-local farmAllOresOn = false
-local farmSelectedOreOn = false
-local autoCapsuleOn = false
-local autoRollOn = false
-local autoT1ChestOn = false
-local autoT2ChestOn = false
+local autoTrialOn        = false
+local farmAllOn          = false
+local farmSelectedOn     = false
+local farmAllOresOn      = false
+local farmSelectedOreOn  = false
+local autoCapsuleOn      = false
+local autoRollOn         = false
+local autoT1ChestOn      = false
+local autoT2ChestOn      = false
 
-local TrialActive = false
-local AutosPaused = false
-local movementCancelled = false
-local hideRollsOn = false
+local TrialActive        = false
+local AutosPaused        = false
+local movementCancelled  = false
+local hideRollsOn        = false
 
-local OreList = {}
-local MobList = {}
-local capsuleOptions = {}
-local capsuleDisplayMap = {}
-local runeOptions = {}
+local OreList            = {}
+local MobList            = {}
+local capsuleOptions     = {}
+local capsuleDisplayMap  = {}
+local runeOptions        = {}
 
+-- Dropdown refs
+local OreDropdown
+local MobDropdown
+local CapsuleDropdown
+local RuneDropdown
+
+---------------------------------------------------------------------
 -- Helpers
+---------------------------------------------------------------------
 local function normalizeMode(mode)
     if typeof(mode) == "table" then
         return mode[1]
     end
     return mode
+end
+
+local function normalizeSelection(v)
+    return typeof(v) == "table" and v[1] or v
 end
 
 local function getRoot()
@@ -94,7 +115,8 @@ local function isTrialMobAlive(mob)
 end
 
 local function leaveTrial()
-    local Event = RS:FindFirstChild("__Net") and RS.__Net:FindFirstChild("MainRemote")
+    local Net = RS:FindFirstChild("__Net")
+    local Event = Net and Net:FindFirstChild("MainRemote")
     if Event then
         Event:FireServer("LeaveTrial")
     end
@@ -112,7 +134,9 @@ local function getTargetCFrame(obj)
     return nil
 end
 
--- Movement (Discord-style, Legit ignores aliveCheckFn)
+---------------------------------------------------------------------
+-- Movement (Legit ignores aliveCheckFn intentionally)
+---------------------------------------------------------------------
 local function moveTo(cframe, aliveCheckFn)
     movementCancelled = false
     local mode = normalizeMode(MovementMode)
@@ -129,7 +153,6 @@ local function moveTo(cframe, aliveCheckFn)
     end
 
     if mode == "Tween" then
-        local TweenService = game:GetService("TweenService")
         local distance = (root.Position - cframe.Position).Magnitude
         local tween = TweenService:Create(
             root,
@@ -198,62 +221,87 @@ local function moveTo(cframe, aliveCheckFn)
     connection:Disconnect()
 end
 
--- Lists
-local function refreshOreList()
-    local oresFolder = GameContent:FindFirstChild("Ores")
-    if not oresFolder then return end
-    local seen = {}
-    OreList = {}
-    for _, ore in ipairs(oresFolder:GetChildren()) do
-        local cleanName = ore.Name:match("^(.-)#?%d*$") or ore.Name
-        if not seen[cleanName] then
-            seen[cleanName] = true
-            table.insert(OreList, cleanName)
-        end
-    end
-end
+local function getClosest(folder, filterFn)
+    local root = getRoot()
+    if not root then return nil end
 
-local function refreshMobList()
-    local mobsFolder = GameContent:FindFirstChild("Mobs")
-    if not mobsFolder then return end
-    local seen = {}
-    MobList = {}
-    for _, mob in ipairs(mobsFolder:GetChildren()) do
-        local cleanName = mob.Name:match("^(.-)#?%d*$") or mob.Name
-        if not seen[cleanName] then
-            seen[cleanName] = true
-            table.insert(MobList, cleanName)
-        end
-    end
-end
+    local best, bestDist
 
-local function refreshCapsuleList()
-    local options = {}
-    local displayToFull = {}
-    local uiZones = GameContent:FindFirstChild("UIZones")
-    if uiZones then
-        for _, child in ipairs(uiZones:GetChildren()) do
-            if child.Name:find("__Capsule") then
-                local displayName = child.Name:gsub("__Capsule", "")
-                if displayName == "" then displayName = "Default" end
-                table.insert(options, displayName)
-                displayToFull[displayName] = child.Name
+    for _, obj in ipairs(folder:GetChildren()) do
+        if filterFn(obj) then
+            local cf = getTargetCFrame(obj)
+            if cf then
+                local dist = (root.Position - cf.Position).Magnitude
+                if not bestDist or dist < bestDist then
+                    bestDist = dist
+                    best = obj
+                end
             end
         end
     end
-    capsuleOptions = options
-    capsuleDisplayMap = displayToFull
+
+    return best
+end
+
+---------------------------------------------------------------------
+-- Lists + Refresh
+---------------------------------------------------------------------
+local function refreshOreList()
+    local seen, list = {}, {}
+
+    for _, ore in ipairs(OresFolder:GetChildren()) do
+        local clean = ore.Name:match("^(.-)#?%d*$") or ore.Name
+        if not seen[clean] then
+            seen[clean] = true
+            table.insert(list, clean)
+        end
+    end
+
+    OreList = list
+    if OreDropdown then OreDropdown:Refresh(list) end
+end
+
+local function refreshMobList()
+    local seen, list = {}, {}
+
+    for _, mob in ipairs(MobsFolder:GetChildren()) do
+        local clean = mob.Name:match("^(.-)#?%d*$") or mob.Name
+        if not seen[clean] then
+            seen[clean] = true
+            table.insert(list, clean)
+        end
+    end
+
+    MobList = list
+    if MobDropdown then MobDropdown:Refresh(list) end
+end
+
+local function refreshCapsuleList()
+    local list, map = {}, {}
+
+    for _, child in ipairs(UIZones:GetChildren()) do
+        if child.Name:find("__Capsule") then
+            local display = child.Name:gsub("__Capsule", "")
+            if display == "" then display = "Default" end
+            table.insert(list, display)
+            map[display] = child.Name
+        end
+    end
+
+    capsuleOptions    = list
+    capsuleDisplayMap = map
+    if CapsuleDropdown then CapsuleDropdown:Refresh(list) end
 end
 
 local function refreshRuneList()
-    local options = {}
-    local runeZones = GameContent:FindFirstChild("RuneZones")
-    if runeZones then
-        for _, child in ipairs(runeZones:GetChildren()) do
-            table.insert(options, child.Name)
-        end
+    local list = {}
+
+    for _, child in ipairs(RuneZones:GetChildren()) do
+        table.insert(list, child.Name)
     end
-    runeOptions = options
+
+    runeOptions = list
+    if RuneDropdown then RuneDropdown:Refresh(list) end
 end
 
 refreshOreList()
@@ -261,73 +309,22 @@ refreshMobList()
 refreshCapsuleList()
 refreshRuneList()
 
--- Auto-refresh lists
-local oresFolder = GameContent:FindFirstChild("Ores")
-local mobsFolderRoot = GameContent:FindFirstChild("Mobs")
-local uiZonesRoot = GameContent:FindFirstChild("UIZones")
-local runeZonesRoot = GameContent:FindFirstChild("RuneZones")
+-- Auto-refresh hooks
+OresFolder.ChildAdded:Connect(refreshOreList)
+OresFolder.ChildRemoved:Connect(refreshOreList)
 
-if oresFolder then
-    oresFolder.ChildAdded:Connect(function()
-        refreshOreList()
-        if _G.OreDropdown then
-            _G.OreDropdown:Set(OreList)
-        end
-    end)
-    oresFolder.ChildRemoved:Connect(function()
-        refreshOreList()
-        if _G.OreDropdown then
-            _G.OreDropdown:Set(OreList)
-        end
-    end)
-end
+MobsFolder.ChildAdded:Connect(refreshMobList)
+MobsFolder.ChildRemoved:Connect(refreshMobList)
 
-if mobsFolderRoot then
-    mobsFolderRoot.ChildAdded:Connect(function()
-        refreshMobList()
-        if _G.MobDropdown then
-            _G.MobDropdown:Set(MobList)
-        end
-    end)
-    mobsFolderRoot.ChildRemoved:Connect(function()
-        refreshMobList()
-        if _G.MobDropdown then
-            _G.MobDropdown:Set(MobList)
-        end
-    end)
-end
+UIZones.ChildAdded:Connect(refreshCapsuleList)
+UIZones.ChildRemoved:Connect(refreshCapsuleList)
 
-if uiZonesRoot then
-    uiZonesRoot.ChildAdded:Connect(function()
-        refreshCapsuleList()
-        if _G.CapsuleDropdown then
-            _G.CapsuleDropdown:Set(capsuleOptions)
-        end
-    end)
-    uiZonesRoot.ChildRemoved:Connect(function()
-        refreshCapsuleList()
-        if _G.CapsuleDropdown then
-            _G.CapsuleDropdown:Set(capsuleOptions)
-        end
-    end)
-end
+RuneZones.ChildAdded:Connect(refreshRuneList)
+RuneZones.ChildRemoved:Connect(refreshRuneList)
 
-if runeZonesRoot then
-    runeZonesRoot.ChildAdded:Connect(function()
-        refreshRuneList()
-        if _G.RuneDropdown then
-            _G.RuneDropdown:Set(runeOptions)
-        end
-    end)
-    runeZonesRoot.ChildRemoved:Connect(function()
-        refreshRuneList()
-        if _G.RuneDropdown then
-            _G.RuneDropdown:Set(runeOptions)
-        end
-    end)
-end
-
+---------------------------------------------------------------------
 -- Rayfield UI
+---------------------------------------------------------------------
 local Window = Rayfield:CreateWindow({
     Name = "Noob Incremental Script",
     LoadingTitle = "Loading PinguHub...",
@@ -352,14 +349,16 @@ local ItemsTab         = Window:CreateTab("Items")
 local MiscTab          = Window:CreateTab("Misc")
 local CreditsTab       = Window:CreateTab("Credits")
 
+---------------------------------------------------------------------
 -- Settings
+---------------------------------------------------------------------
 SettingsTab:CreateDropdown({
     Name = "Movement Mode",
     Options = { "Teleport", "Tween", "Walk", "Legit" },
-    CurrentOption = MovementMode,
+    CurrentOption = { MovementMode },
     MultipleOptions = false,
     Callback = function(selected)
-        MovementMode = normalizeMode(selected)
+        MovementMode = normalizeSelection(selected)
     end
 })
 
@@ -398,17 +397,19 @@ SettingsTab:CreateToggle({
     end
 })
 
+---------------------------------------------------------------------
 -- AutoTrial
-local leaveTime = 900
+---------------------------------------------------------------------
+local leaveTime        = 900
 local autoLeaveEnabled = false
 
 AutoTrialTab:CreateDropdown({
     Name = "Trial Difficulty",
     Options = { "Hard", "Medium", "Easy" },
-    CurrentOption = SelectedTrialDifficulty,
+    CurrentOption = { SelectedTrialDifficulty },
     MultipleOptions = false,
     Callback = function(selected)
-        SelectedTrialDifficulty = normalizeMode(selected)
+        SelectedTrialDifficulty = normalizeSelection(selected)
     end
 })
 
@@ -416,7 +417,7 @@ AutoTrialTab:CreateSlider({
     Name = "Leave Trial After (Seconds)",
     Range = {1, 1200},
     Increment = 1,
-    CurrentValue = 900,
+    CurrentValue = leaveTime,
     Callback = function(value)
         leaveTime = value
     end
@@ -449,8 +450,7 @@ task.spawn(function()
         local entryOpen = trialsStatus and trialsStatus:FindFirstChild("EntryOpen")
 
         if entryOpen and entryOpen.Value == true and not TrialActive then
-            local trialsRoot = GameContent:FindFirstChild("Trials")
-            local trialRoom = trialsRoot and trialsRoot:FindFirstChild(SelectedTrialDifficulty .. "TrialRoom")
+            local trialRoom = TrialsRoot:FindFirstChild(SelectedTrialDifficulty .. "TrialRoom")
             local trialModel = trialRoom and trialRoom:FindFirstChild("__Trial" .. SelectedTrialDifficulty .. "Room")
             local touchPart = trialModel and trialModel:FindFirstChild("TouchPart")
 
@@ -465,15 +465,14 @@ task.spawn(function()
         if TrialActive then
             AutosPaused = false
 
-            local timeLeft = RS.TrialsStatus[SelectedTrialDifficulty].TimeLeft
-            if autoLeaveEnabled and timeLeft.Value > 0 and timeLeft.Value <= leaveTime then
+            local timeLeftObj = RS.TrialsStatus[SelectedTrialDifficulty].TimeLeft
+            if autoLeaveEnabled and timeLeftObj.Value > 0 and timeLeftObj.Value <= leaveTime then
                 leaveTrial()
                 AutosPaused = false
                 continue
             end
 
-            local trialsRoot = GameContent:FindFirstChild("Trials")
-            local trialRoom = trialsRoot and trialsRoot:FindFirstChild(SelectedTrialDifficulty .. "TrialRoom")
+            local trialRoom = TrialsRoot:FindFirstChild(SelectedTrialDifficulty .. "TrialRoom")
             local mobsFolder = trialRoom and trialRoom:FindFirstChild("Mobs")
 
             if mobsFolder then
@@ -482,6 +481,7 @@ task.spawn(function()
                     local mode = normalizeMode(MovementMode)
 
                     if mode == "Legit" then
+                        -- Legit: sequential, no alive checks, mobs disappear when dead
                         for _, mob in ipairs(mobsFolder:GetChildren()) do
                             local cf = getTargetCFrame(mob)
                             if cf then
@@ -491,20 +491,9 @@ task.spawn(function()
                             end
                         end
                     else
-                        local closestMob, closestDist
-
-                        for _, mob in ipairs(mobsFolder:GetChildren()) do
-                            if isTrialMobAlive(mob) then
-                                local cf = getTargetCFrame(mob)
-                                if cf then
-                                    local dist = (root.Position - cf.Position).Magnitude
-                                    if not closestDist or dist < closestDist then
-                                        closestDist = dist
-                                        closestMob = mob
-                                    end
-                                end
-                            end
-                        end
+                        local closestMob = getClosest(mobsFolder, function(m)
+                            return isTrialMobAlive(m)
+                        end)
 
                         if closestMob then
                             local cf = getTargetCFrame(closestMob)
@@ -524,14 +513,16 @@ task.spawn(function()
     end
 end)
 
+---------------------------------------------------------------------
 -- AutoOres
-_G.OreDropdown = AutoOresTab:CreateDropdown({
+---------------------------------------------------------------------
+OreDropdown = AutoOresTab:CreateDropdown({
     Name = "Target Ore",
     Options = OreList,
-    CurrentOption = "",
+    CurrentOption = {},
     MultipleOptions = true,
     Callback = function(selected)
-        SelectedOre = normalizeMode(selected)
+        SelectedOre = normalizeSelection(selected)
     end
 })
 
@@ -548,9 +539,8 @@ AutoOresTab:CreateToggle({
                 updateAutoPauseState()
                 if AutosPaused then task.wait(0.1) continue end
 
-                local oresFolder = GameContent:FindFirstChild("Ores")
                 local root = getRoot()
-                if not oresFolder or not root then
+                if not root then
                     task.wait(0.1)
                     continue
                 end
@@ -558,9 +548,9 @@ AutoOresTab:CreateToggle({
                 local mode = normalizeMode(MovementMode)
 
                 if mode == "Legit" then
-                    for _, ore in ipairs(oresFolder:GetChildren()) do
+                    -- Legit: sequential, no alive checks
+                    for _, ore in ipairs(OresFolder:GetChildren()) do
                         if not farmAllOresOn then break end
-
                         local cf = getTargetCFrame(ore)
                         if cf then
                             movementCancelled = false
@@ -569,20 +559,9 @@ AutoOresTab:CreateToggle({
                         end
                     end
                 else
-                    local closestOre, closestDist
-
-                    for _, ore in ipairs(oresFolder:GetChildren()) do
-                        if isAlive(ore) then
-                            local cf = getTargetCFrame(ore)
-                            if cf then
-                                local dist = (root.Position - cf.Position).Magnitude
-                                if not closestDist or dist < closestDist then
-                                    closestDist = dist
-                                    closestOre = ore
-                                end
-                            end
-                        end
-                    end
+                    local closestOre = getClosest(OresFolder, function(o)
+                        return isAlive(o)
+                    end)
 
                     if closestOre then
                         local cf = getTargetCFrame(closestOre)
@@ -614,9 +593,8 @@ AutoOresTab:CreateToggle({
                 updateAutoPauseState()
                 if AutosPaused then task.wait(0.1) continue end
 
-                local oresFolder = GameContent:FindFirstChild("Ores")
                 local root = getRoot()
-                if not oresFolder or not root then
+                if not root or not SelectedOre then
                     task.wait(0.1)
                     continue
                 end
@@ -624,9 +602,9 @@ AutoOresTab:CreateToggle({
                 local mode = normalizeMode(MovementMode)
 
                 if mode == "Legit" then
-                    for _, ore in ipairs(oresFolder:GetChildren()) do
+                    -- Legit: sequential over matching ore names, no alive checks
+                    for _, ore in ipairs(OresFolder:GetChildren()) do
                         if not farmSelectedOreOn then break end
-
                         local cleanName = ore.Name:match("^(.-)#?%d*$") or ore.Name
                         if cleanName == SelectedOre then
                             local cf = getTargetCFrame(ore)
@@ -638,21 +616,10 @@ AutoOresTab:CreateToggle({
                         end
                     end
                 else
-                    local closestOre, closestDist
-
-                    for _, ore in ipairs(oresFolder:GetChildren()) do
-                        local cleanName = ore.Name:match("^(.-)#?%d*$") or ore.Name
-                        if cleanName == SelectedOre and isAlive(ore) then
-                            local cf = getTargetCFrame(ore)
-                            if cf then
-                                local dist = (root.Position - cf.Position).Magnitude
-                                if not closestDist or dist < closestDist then
-                                    closestDist = dist
-                                    closestOre = ore
-                                end
-                            end
-                        end
-                    end
+                    local closestOre = getClosest(OresFolder, function(o)
+                        local cleanName = o.Name:match("^(.-)#?%d*$") or o.Name
+                        return cleanName == SelectedOre and isAlive(o)
+                    end)
 
                     if closestOre then
                         local cf = getTargetCFrame(closestOre)
@@ -671,14 +638,16 @@ AutoOresTab:CreateToggle({
     end
 })
 
+---------------------------------------------------------------------
 -- AutoMobs
-_G.MobDropdown = AutoMobsTab:CreateDropdown({
+---------------------------------------------------------------------
+MobDropdown = AutoMobsTab:CreateDropdown({
     Name = "Target Mob",
     Options = MobList,
-    CurrentOption = "",
+    CurrentOption = {},
     MultipleOptions = true,
     Callback = function(selected)
-        SelectedMob = normalizeMode(selected)
+        SelectedMob = normalizeSelection(selected)
     end
 })
 
@@ -695,9 +664,8 @@ AutoMobsTab:CreateToggle({
                 updateAutoPauseState()
                 if AutosPaused then task.wait(0.1) continue end
 
-                local mobsFolder = GameContent:FindFirstChild("Mobs")
                 local root = getRoot()
-                if not mobsFolder or not root then
+                if not root then
                     task.wait(0.1)
                     continue
                 end
@@ -705,9 +673,9 @@ AutoMobsTab:CreateToggle({
                 local mode = normalizeMode(MovementMode)
 
                 if mode == "Legit" then
-                    for _, mob in ipairs(mobsFolder:GetChildren()) do
+                    -- Legit: sequential, no alive checks
+                    for _, mob in ipairs(MobsFolder:GetChildren()) do
                         if not farmAllOn then break end
-
                         local cf = getTargetCFrame(mob)
                         if cf then
                             movementCancelled = false
@@ -716,20 +684,9 @@ AutoMobsTab:CreateToggle({
                         end
                     end
                 else
-                    local closestMob, closestDist
-
-                    for _, mob in ipairs(mobsFolder:GetChildren()) do
-                        if isAlive(mob) then
-                            local cf = getTargetCFrame(mob)
-                            if cf then
-                                local dist = (root.Position - cf.Position).Magnitude
-                                if not closestDist or dist < closestDist then
-                                    closestDist = dist
-                                    closestMob = mob
-                                end
-                            end
-                        end
-                    end
+                    local closestMob = getClosest(MobsFolder, function(m)
+                        return isAlive(m)
+                    end)
 
                     if closestMob then
                         local cf = getTargetCFrame(closestMob)
@@ -761,9 +718,8 @@ AutoMobsTab:CreateToggle({
                 updateAutoPauseState()
                 if AutosPaused then task.wait(0.1) continue end
 
-                local mobsFolder = GameContent:FindFirstChild("Mobs")
                 local root = getRoot()
-                if not mobsFolder or not root then
+                if not root or not SelectedMob then
                     task.wait(0.1)
                     continue
                 end
@@ -771,9 +727,9 @@ AutoMobsTab:CreateToggle({
                 local mode = normalizeMode(MovementMode)
 
                 if mode == "Legit" then
-                    for _, mob in ipairs(mobsFolder:GetChildren()) do
+                    -- Legit: sequential over matching mob names, no alive checks
+                    for _, mob in ipairs(MobsFolder:GetChildren()) do
                         if not farmSelectedOn then break end
-
                         local cleanName = mob.Name:match("^(.-)#?%d*$") or mob.Name
                         if cleanName == SelectedMob then
                             local cf = getTargetCFrame(mob)
@@ -785,21 +741,10 @@ AutoMobsTab:CreateToggle({
                         end
                     end
                 else
-                    local closestMob, closestDist
-
-                    for _, mob in ipairs(mobsFolder:GetChildren()) do
-                        local cleanName = mob.Name:match("^(.-)#?%d*$") or mob.Name
-                        if cleanName == SelectedMob and isAlive(mob) then
-                            local cf = getTargetCFrame(mob)
-                            if cf then
-                                local dist = (root.Position - cf.Position).Magnitude
-                                if not closestDist or dist < closestDist then
-                                    closestDist = dist
-                                    closestMob = mob
-                                end
-                            end
-                        end
-                    end
+                    local closestMob = getClosest(MobsFolder, function(m)
+                        local cleanName = m.Name:match("^(.-)#?%d*$") or m.Name
+                        return cleanName == SelectedMob and isAlive(m)
+                    end)
 
                     if closestMob then
                         local cf = getTargetCFrame(closestMob)
@@ -818,15 +763,16 @@ AutoMobsTab:CreateToggle({
     end
 })
 
---== AutoCapsules ==--
-
-_G.CapsuleDropdown = AutoCapsulesTab:CreateDropdown({
+---------------------------------------------------------------------
+-- AutoCapsules
+---------------------------------------------------------------------
+CapsuleDropdown = AutoCapsulesTab:CreateDropdown({
     Name = "Capsule",
     Options = capsuleOptions,
-    CurrentOption = "",
+    CurrentOption = {},
     MultipleOptions = false,
     Callback = function(selected)
-        SelectedCapsule = normalizeMode(selected)
+        SelectedCapsule = normalizeSelection(selected)
     end
 })
 
@@ -845,8 +791,7 @@ AutoCapsulesTab:CreateToggle({
 
                 if SelectedCapsule then
                     local fullName = capsuleDisplayMap[SelectedCapsule]
-                    local uiZones = GameContent:FindFirstChild("UIZones")
-                    local capsuleObj = uiZones and uiZones:FindFirstChild(fullName)
+                    local capsuleObj = fullName and UIZones:FindFirstChild(fullName)
 
                     if capsuleObj then
                         local cf = getTargetCFrame(capsuleObj)
@@ -856,25 +801,20 @@ AutoCapsulesTab:CreateToggle({
                             local dist = (root.Position - cf.Position).Magnitude
                             local mode = normalizeMode(MovementMode)
 
-                            -- ONLY MOVE IF >10 STUDS AWAY
                             if dist > 10 then
                                 movementCancelled = false
-
                                 if mode == "Legit" then
                                     moveTo(cf, nil)
                                 else
                                     moveTo(cf)
                                 end
+                            end
 
-                                -- Fire auto-open AFTER movement
-                                local Net = RS:FindFirstChild("__Net")
-                                if Net then
-                                    local Event = Net:FindFirstChild("MainRemote")
-                                    if Event then
-                                        task.wait(1)
-                                        Event:FireServer("ToggleMinionAutoOpen", SelectedCapsule)
-                                    end
-                                end
+                            local Net = RS:FindFirstChild("__Net")
+                            local Event = Net and Net:FindFirstChild("MainRemote")
+                            if Event then
+                                task.wait(1)
+                                Event:FireServer("ToggleMinionAutoOpen", SelectedCapsule)
                             end
                         end
                     end
@@ -886,15 +826,16 @@ AutoCapsulesTab:CreateToggle({
     end
 })
 
---== AutoRunes ==--
-
-_G.RuneDropdown = AutoRunesTab:CreateDropdown({
+---------------------------------------------------------------------
+-- AutoRunes
+---------------------------------------------------------------------
+RuneDropdown = AutoRunesTab:CreateDropdown({
     Name = "Runes",
     Options = runeOptions,
-    CurrentOption = "",
+    CurrentOption = {},
     MultipleOptions = false,
     Callback = function(selected)
-        SelectedRune = normalizeMode(selected)
+        SelectedRune = normalizeSelection(selected)
     end
 })
 
@@ -912,8 +853,7 @@ AutoRunesTab:CreateToggle({
                 if AutosPaused then task.wait(0.1) continue end
 
                 if SelectedRune then
-                    local runeZones = GameContent:FindFirstChild("RuneZones")
-                    local runeObj = runeZones and runeZones:FindFirstChild(SelectedRune)
+                    local runeObj = RuneZones:FindFirstChild(SelectedRune)
 
                     if runeObj then
                         local cf = getTargetCFrame(runeObj)
@@ -923,10 +863,8 @@ AutoRunesTab:CreateToggle({
                             local dist = (root.Position - cf.Position).Magnitude
                             local mode = normalizeMode(MovementMode)
 
-                            -- ONLY MOVE IF >10 STUDS AWAY
                             if dist > 10 then
                                 movementCancelled = false
-
                                 if mode == "Legit" then
                                     moveTo(cf, nil)
                                 else
@@ -943,7 +881,9 @@ AutoRunesTab:CreateToggle({
     end
 })
 
+---------------------------------------------------------------------
 -- Items
+---------------------------------------------------------------------
 ItemsTab:CreateToggle({
     Name = "Auto Use T1 Chest",
     CurrentValue = false,
@@ -954,11 +894,9 @@ ItemsTab:CreateToggle({
         task.spawn(function()
             while autoT1ChestOn do
                 local Net = RS:FindFirstChild("__Net")
-                if Net then
-                    local Event = Net:FindFirstChild("MainRemote")
-                    if Event then
-                        Event:FireServer("OpenChest", "T1TrialChest", 100)
-                    end
+                local Event = Net and Net:FindFirstChild("MainRemote")
+                if Event then
+                    Event:FireServer("OpenChest", "T1TrialChest", 100)
                 end
                 task.wait(2)
             end
@@ -976,11 +914,9 @@ ItemsTab:CreateToggle({
         task.spawn(function()
             while autoT2ChestOn do
                 local Net = RS:FindFirstChild("__Net")
-                if Net then
-                    local Event = Net:FindFirstChild("MainRemote")
-                    if Event then
-                        Event:FireServer("OpenChest", "T2TrialChest", 100)
-                    end
+                local Event = Net and Net:FindFirstChild("MainRemote")
+                if Event then
+                    Event:FireServer("OpenChest", "T2TrialChest", 100)
                 end
                 task.wait(2)
             end
@@ -988,7 +924,9 @@ ItemsTab:CreateToggle({
     end
 })
 
+---------------------------------------------------------------------
 -- Ancient Fragment Viewer
+---------------------------------------------------------------------
 local fragSection = MiscTab:CreateSection("Ancient Fragment Viewer")
 local fragLabels = {}
 
@@ -1010,27 +948,36 @@ local function updateFragmentLabel(player, valueText)
 end
 
 local function watchFragmentValue(player)
-    local valueObj = getFragmentValueObject(player)
-    if not valueObj then
-        updateFragmentLabel(player, "N/A")
-        return
-    end
-    updateFragmentLabel(player, tostring(valueObj.Value))
-    valueObj.Changed:Connect(function(newValue)
-        updateFragmentLabel(player, tostring(newValue))
+    task.spawn(function()
+        local valueObj
+
+        -- Retry for up to 10 seconds
+        for _ = 1, 10 do
+            valueObj = getFragmentValueObject(player)
+            if valueObj then break end
+            task.wait(1)
+        end
+
+        -- Still missing? Show N/A
+        if not valueObj then
+            updateFragmentLabel(player, "N/A")
+            return
+        end
+
+        -- Found it — update and listen
+        updateFragmentLabel(player, tostring(valueObj.Value))
+
+        valueObj.Changed:Connect(function(newValue)
+            updateFragmentLabel(player, tostring(newValue))
+        end)
     end)
 end
+
 
 local function createFragmentRow(player)
     if fragLabels[player] then return end
     fragLabels[player] = MiscTab:CreateLabel(player.Name .. " — ...")
-    task.spawn(function()
-        for _ = 1, 10 do
-            if getFragmentValueObject(player) then break end
-            task.wait(1)
-        end
-        watchFragmentValue(player)
-    end)
+    watchFragmentValue(player)
 end
 
 local function removeFragmentRow(player)
@@ -1044,15 +991,12 @@ for _, p in ipairs(Players:GetPlayers()) do
     createFragmentRow(p)
 end
 
-Players.PlayerAdded:Connect(function(p)
-    createFragmentRow(p)
-end)
+Players.PlayerAdded:Connect(createFragmentRow)
+Players.PlayerRemoving:Connect(removeFragmentRow)
 
-Players.PlayerRemoving:Connect(function(p)
-    removeFragmentRow(p)
-end)
-
+---------------------------------------------------------------------
 -- Credits
+---------------------------------------------------------------------
 CreditsTab:CreateSection("Credits")
 CreditsTab:CreateLabel("Made by pengus3npai")
 
@@ -1072,26 +1016,20 @@ CreditsTab:CreateButton({
             nonce = http:GenerateGUID(false)
         }
 
+        local reqPayload = {
+            Url = "http://127.0.0.1:6463/rpc?v=1",
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json",
+                ["Origin"] = "https://discord.com"
+            },
+            Body = http:JSONEncode(payload)
+        }
+
         if syn and syn.request then
-            syn.request({
-                Url = "http://127.0.0.1:6463/rpc?v=1",
-                Method = "POST",
-                Headers = {
-                    ["Content-Type"] = "application/json",
-                    ["Origin"] = "https://discord.com"
-                },
-                Body = http:JSONEncode(payload)
-            })
+            syn.request(reqPayload)
         elseif request then
-            request({
-                Url = "http://127.0.0.1:6463/rpc?v=1",
-                Method = "POST",
-                Headers = {
-                    ["Content-Type"] = "application/json",
-                    ["Origin"] = "https://discord.com"
-                },
-                Body = http:JSONEncode(payload)
-            })
+            request(reqPayload)
         end
 
         Rayfield:Notify({
