@@ -770,6 +770,31 @@ AutoMobsTab:CreateToggle({
     end
 })
 
+AutoMobsTab:CreateToggle({
+    Name = "Auto Start Ritual",
+    CurrentValue = false,
+    Callback = function(state)
+        autoStartRitualOn = state
+        if not state then return end
+
+        task.spawn(function()
+            while autoStartRitualOn do
+                updateAutoPauseState()
+                if AutosPaused then task.wait(0.1) continue end
+
+                local Net = RS:FindFirstChild("__Net")
+                local Event = Net and Net:FindFirstChild("MainRemote")
+
+                if Event then
+                    Event:FireServer("StartRitual")
+                end
+
+                task.wait(1) -- adjust if needed
+            end
+        end)
+    end
+})
+
 ---------------------------------------------------------------------
 -- AutoCapsules
 ---------------------------------------------------------------------
