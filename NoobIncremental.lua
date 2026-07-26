@@ -1,4 +1,4 @@
---== NoobIncremental Rayfield Version (Optimized) ==--
+--== NoobIncremental ==--
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
@@ -24,8 +24,8 @@ task.wait(0.25)
 ---------------------------------------------------------------------
 local MovementMode            = "Teleport"
 local SelectedTrialDifficulty = "Easy"
-local SelectedMob             = nil
-local SelectedOre             = nil
+local SelectedMob             = {}
+local SelectedOre             = {}
 local SelectedCapsule         = nil
 local SelectedRune            = nil
 
@@ -320,7 +320,6 @@ UIZones.ChildAdded:Connect(refreshCapsuleList)
 UIZones.ChildRemoved:Connect(refreshCapsuleList)
 
 RuneZones.ChildAdded:Connect(refreshRuneList)
-RuneZones.ChildRemoved:Connect(refreshRuneList)
 
 ---------------------------------------------------------------------
 -- Rayfield UI
@@ -346,6 +345,7 @@ local AutoMobsTab      = Window:CreateTab("AutoMobs")
 local AutoCapsulesTab  = Window:CreateTab("AutoCapsules")
 local AutoRunesTab     = Window:CreateTab("AutoRunes")
 local ItemsTab         = Window:CreateTab("Items")
+local UITab			   = Window:CreateTab("UI")
 local MiscTab          = Window:CreateTab("Misc")
 local CreditsTab       = Window:CreateTab("Credits")
 
@@ -401,7 +401,7 @@ SettingsTab:CreateToggle({
 -- AutoTrial
 ---------------------------------------------------------------------
 local leaveTime        = 900
-local autoLeaveEnabled = false
+local autoLeaveEnabled = true
 
 AutoTrialTab:CreateDropdown({
     Name = "Trial Difficulty",
@@ -414,7 +414,7 @@ AutoTrialTab:CreateDropdown({
 })
 
 AutoTrialTab:CreateSlider({
-    Name = "Leave Trial After (Seconds)",
+    Name = "Leave Trial At (Seconds) Left",
     Range = {1, 1200},
     Increment = 1,
     CurrentValue = leaveTime,
@@ -468,6 +468,13 @@ task.spawn(function()
             local timeLeftObj = RS.TrialsStatus[SelectedTrialDifficulty].TimeLeft
             if autoLeaveEnabled and timeLeftObj.Value > 0 and timeLeftObj.Value <= leaveTime then
                 leaveTrial()
+
+                -- Wait until trial actually ends
+                repeat
+                    task.wait(0.2)
+                    updateAutoPauseState()
+                until not TrialActive
+
                 AutosPaused = false
                 continue
             end
@@ -522,7 +529,7 @@ OreDropdown = AutoOresTab:CreateDropdown({
     CurrentOption = {},
     MultipleOptions = true,
     Callback = function(selected)
-        SelectedOre = normalizeSelection(selected)
+        SelectedOre = selected -- keep full table for multi-select
     end
 })
 
@@ -594,7 +601,7 @@ AutoOresTab:CreateToggle({
                 if AutosPaused then task.wait(0.1) continue end
 
                 local root = getRoot()
-                if not root or not SelectedOre then
+                if not root or not SelectedOre or #SelectedOre == 0 then
                     task.wait(0.1)
                     continue
                 end
@@ -606,7 +613,7 @@ AutoOresTab:CreateToggle({
                     for _, ore in ipairs(OresFolder:GetChildren()) do
                         if not farmSelectedOreOn then break end
                         local cleanName = ore.Name:match("^(.-)#?%d*$") or ore.Name
-                        if cleanName == SelectedOre then
+                        if table.find(SelectedOre, cleanName) then
                             local cf = getTargetCFrame(ore)
                             if cf then
                                 movementCancelled = false
@@ -618,7 +625,7 @@ AutoOresTab:CreateToggle({
                 else
                     local closestOre = getClosest(OresFolder, function(o)
                         local cleanName = o.Name:match("^(.-)#?%d*$") or o.Name
-                        return cleanName == SelectedOre and isAlive(o)
+                        return table.find(SelectedOre, cleanName) and isAlive(o)
                     end)
 
                     if closestOre then
@@ -647,7 +654,7 @@ MobDropdown = AutoMobsTab:CreateDropdown({
     CurrentOption = {},
     MultipleOptions = true,
     Callback = function(selected)
-        SelectedMob = normalizeSelection(selected)
+        SelectedMob = selected -- keep full table for multi-select
     end
 })
 
@@ -706,20 +713,20 @@ AutoMobsTab:CreateToggle({
 })
 
 AutoMobsTab:CreateToggle({
-    Name = "Farm Selected Mobs",
+    Name = "Farm Selected Mob",
     CurrentValue = false,
     Callback = function(state)
-        farmSelectedOn = state
+        farmSelectedMobOn = state
         movementCancelled = not state
         if not state then return end
 
         task.spawn(function()
-            while farmSelectedOn do
+            while farmSelectedMobOn do
                 updateAutoPauseState()
                 if AutosPaused then task.wait(0.1) continue end
 
                 local root = getRoot()
-                if not root or not SelectedMob then
+                if not root or not SelectedMob or #SelectedMob == 0 then
                     task.wait(0.1)
                     continue
                 end
@@ -728,10 +735,10 @@ AutoMobsTab:CreateToggle({
 
                 if mode == "Legit" then
                     -- Legit: sequential over matching mob names, no alive checks
-                    for _, mob in ipairs(MobsFolder:GetChildren()) do
-                        if not farmSelectedOn then break end
+                    for _, omob in ipairs(MobsFolder:GetChildren()) do
+                        if not farmSelectedMobOn then break end
                         local cleanName = mob.Name:match("^(.-)#?%d*$") or mob.Name
-                        if cleanName == SelectedMob then
+                        if table.find(SelectedMob, cleanName) then
                             local cf = getTargetCFrame(mob)
                             if cf then
                                 movementCancelled = false
@@ -741,9 +748,9 @@ AutoMobsTab:CreateToggle({
                         end
                     end
                 else
-                    local closestMob = getClosest(MobsFolder, function(m)
-                        local cleanName = m.Name:match("^(.-)#?%d*$") or m.Name
-                        return cleanName == SelectedMob and isAlive(m)
+                    local closestMob = getClosest(MobsFolder, function(o)
+                        local cleanName = o.Name:match("^(.-)#?%d*$") or o.Name
+                        return table.find(SelectedMob, cleanName) and isAlive(o)
                     end)
 
                     if closestMob then
@@ -924,6 +931,76 @@ ItemsTab:CreateToggle({
     end
 })
 
+UITab:CreateButton({
+    Name = "Open Expedition UI",
+    Callback = function()
+        local Event = game:GetService("ReplicatedStorage").__Net.ToggleUI
+        firesignal(Event.OnClientEvent, "Open", "Expedition")
+    end
+})
+
+UITab:CreateButton({
+    Name = "Open Enchants UI",
+    Callback = function()
+        local Event = game:GetService("ReplicatedStorage").__Net.ToggleUI
+        firesignal(Event.OnClientEvent, "Open", "Enchants")
+    end
+})
+
+
+MiscTab:CreateButton({
+    Name = "Print Debug Info",
+    Callback = function()
+        print("===== DEBUG INFO =====")
+
+        -- Movement + Trial
+        print("MovementMode:", MovementMode)
+        print("SelectedTrialDifficulty:", SelectedTrialDifficulty)
+
+        -- Trial status
+        local ts = RS:FindFirstChild("TrialsStatus")
+        if ts and ts:FindFirstChild(SelectedTrialDifficulty) then
+            print("TimeLeft:", ts[SelectedTrialDifficulty].TimeLeft.Value)
+            if ts[SelectedTrialDifficulty]:FindFirstChild("InTrial") then
+                print("InTrial:", ts[SelectedTrialDifficulty].InTrial.Value)
+            end
+        else
+            print("TimeLeft: <invalid difficulty>")
+        end
+
+		print("AutoLeaveTime", leaveTime)
+        print("TrialActive:", TrialActive)
+        print("AutosPaused:", AutosPaused)
+
+        -- Toggles
+        print("autoTrialOn:", autoTrialOn)
+        print("autoLeaveEnabled:", autoLeaveEnabled)
+        print("farmAllOn:", farmAllOn)
+        print("farmSelectedOn:", farmSelectedOn)
+        print("farmAllOresOn:", farmAllOresOn)
+        print("farmSelectedOreOn:", farmSelectedOreOn)
+        print("autoCapsuleOn:", autoCapsuleOn)
+        print("autoRollOn:", autoRollOn)
+        print("autoT1ChestOn:", autoT1ChestOn)
+        print("autoT2ChestOn:", autoT2ChestOn)
+        print("hideRollsOn:", hideRollsOn)
+
+        -- Dropdown selections
+        print("SelectedMob:", SelectedMob)
+        print("SelectedOre:", SelectedOre)
+        print("SelectedCapsule:", SelectedCapsule)
+        print("SelectedRune:", SelectedRune)
+
+        -- Lists
+        print("MobList:", MobList)
+        print("OreList:", OreList)
+        print("CapsuleOptions:", capsuleOptions)
+        print("RuneOptions:", runeOptions)
+
+        print("===== END DEBUG =====")
+    end
+})
+
 ---------------------------------------------------------------------
 -- Ancient Fragment Viewer
 ---------------------------------------------------------------------
@@ -972,7 +1049,6 @@ local function watchFragmentValue(player)
         end)
     end)
 end
-
 
 local function createFragmentRow(player)
     if fragLabels[player] then return end
