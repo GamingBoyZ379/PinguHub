@@ -1028,6 +1028,30 @@ UITab:CreateButton({
     end
 })
 
+UITab:CreateButton({
+    Name = "Open Sword Enchants",
+    Callback = function()
+        local Event = game:GetService("ReplicatedStorage").__Net.ToggleUI
+        firesignal(Event.OnClientEvent, "Open", "SwordEnchants")
+    end
+})
+
+UITab:CreateButton({
+    Name = "Open Auras",
+    Callback = function()
+        local Event = game:GetService("ReplicatedStorage").__Net.ToggleUI
+        firesignal(Event.OnClientEvent, "Open", "Auras")
+    end
+})
+
+UITab:CreateButton({
+    Name = "Open Rune Sacrifice",
+    Callback = function()
+        local Event = game:GetService("ReplicatedStorage").__Net.ToggleUI
+        firesignal(Event.OnClientEvent, "Open", "RuneSacrifice")
+    end
+})
+
 MiscTab:CreateButton({
     Name = "Redeem Codes (Be in a server with others)",
     Callback = function()
