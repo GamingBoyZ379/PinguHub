@@ -541,43 +541,71 @@ AutoOresTab:CreateToggle({
         movementCancelled = not state
         if not state then return end
 
+        local currentGroupName = nil
+
         task.spawn(function()
             while farmAllOresOn do
                 updateAutoPauseState()
                 if AutosPaused then task.wait(0.1) continue end
 
                 local root = getRoot()
-                if not root then
-                    task.wait(0.1)
+                if not root then task.wait(0.1) continue end
+
+                ------------------------------------------------------------------
+                -- Build groups by name
+                ------------------------------------------------------------------
+                local groups = {}
+                for _, ore in ipairs(OresFolder:GetChildren()) do
+                    groups[ore.Name] = groups[ore.Name] or {}
+                    table.insert(groups[ore.Name], ore)
+                end
+
+                ------------------------------------------------------------------
+                -- Pick a group if none selected
+                ------------------------------------------------------------------
+                if not currentGroupName then
+                    local names = {}
+                    for name in pairs(groups) do table.insert(names, name) end
+                    currentGroupName = names[math.random(#names)]
+                end
+
+                local group = groups[currentGroupName]
+                if not group then
+                    currentGroupName = nil
                     continue
                 end
 
-                local mode = normalizeMode(MovementMode)
-
-                if mode == "Legit" then
-                    -- Legit: sequential, no alive checks
-                    for _, ore in ipairs(OresFolder:GetChildren()) do
-                        if not farmAllOresOn then break end
-                        local cf = getTargetCFrame(ore)
-                        if cf then
-                            movementCancelled = false
-                            moveTo(cf, nil)
-                            task.wait(0.1)
-                        end
+                ------------------------------------------------------------------
+                -- Check if any ore in this group is still alive
+                ------------------------------------------------------------------
+                local aliveList = {}
+                for _, ore in ipairs(group) do
+                    if isAlive(ore) then
+                        table.insert(aliveList, ore)
                     end
-                else
-                    local closestOre = getClosest(OresFolder, function(o)
-                        return isAlive(o)
-                    end)
+                end
 
-                    if closestOre then
-                        local cf = getTargetCFrame(closestOre)
-                        if cf then
-                            movementCancelled = false
-                            moveTo(cf, function()
-                                return isAlive(closestOre)
-                            end)
-                        end
+                ------------------------------------------------------------------
+                -- If none alive → roll new group
+                ------------------------------------------------------------------
+                if #aliveList == 0 then
+                    currentGroupName = nil
+                    task.wait(0.05)
+                    continue
+                end
+
+                ------------------------------------------------------------------
+                -- Kill all alive ores in this group
+                ------------------------------------------------------------------
+                for _, ore in ipairs(aliveList) do
+                    if not farmAllOresOn then break end
+
+                    local cf = getTargetCFrame(ore)
+                    if cf then
+                        movementCancelled = false
+                        moveTo(cf, function()
+                            return isAlive(ore)
+                        end)
                     end
                 end
 
@@ -666,43 +694,71 @@ AutoMobsTab:CreateToggle({
         movementCancelled = not state
         if not state then return end
 
+        local currentGroupName = nil
+
         task.spawn(function()
             while farmAllOn do
                 updateAutoPauseState()
                 if AutosPaused then task.wait(0.1) continue end
 
                 local root = getRoot()
-                if not root then
-                    task.wait(0.1)
+                if not root then task.wait(0.1) continue end
+
+                ------------------------------------------------------------------
+                -- Build groups by name
+                ------------------------------------------------------------------
+                local groups = {}
+                for _, mob in ipairs(MobsFolder:GetChildren()) do
+                    groups[mob.Name] = groups[mob.Name] or {}
+                    table.insert(groups[mob.Name], mob)
+                end
+
+                ------------------------------------------------------------------
+                -- Pick a group if none selected
+                ------------------------------------------------------------------
+                if not currentGroupName then
+                    local names = {}
+                    for name in pairs(groups) do table.insert(names, name) end
+                    currentGroupName = names[math.random(#names)]
+                end
+
+                local group = groups[currentGroupName]
+                if not group then
+                    currentGroupName = nil
                     continue
                 end
 
-                local mode = normalizeMode(MovementMode)
-
-                if mode == "Legit" then
-                    -- Legit: sequential, no alive checks
-                    for _, mob in ipairs(MobsFolder:GetChildren()) do
-                        if not farmAllOn then break end
-                        local cf = getTargetCFrame(mob)
-                        if cf then
-                            movementCancelled = false
-                            moveTo(cf, nil)
-                            task.wait(0.1)
-                        end
+                ------------------------------------------------------------------
+                -- Check if any mob in this group is still alive
+                ------------------------------------------------------------------
+                local aliveList = {}
+                for _, mob in ipairs(group) do
+                    if isAlive(mob) then
+                        table.insert(aliveList, mob)
                     end
-                else
-                    local closestMob = getClosest(MobsFolder, function(m)
-                        return isAlive(m)
-                    end)
+                end
 
-                    if closestMob then
-                        local cf = getTargetCFrame(closestMob)
-                        if cf then
-                            movementCancelled = false
-                            moveTo(cf, function()
-                                return isAlive(closestMob)
-                            end)
-                        end
+                ------------------------------------------------------------------
+                -- If none alive → roll new group
+                ------------------------------------------------------------------
+                if #aliveList == 0 then
+                    currentGroupName = nil
+                    task.wait(0.05)
+                    continue
+                end
+
+                ------------------------------------------------------------------
+                -- Kill all alive mobs in this group
+                ------------------------------------------------------------------
+                for _, mob in ipairs(aliveList) do
+                    if not farmAllOn then break end
+
+                    local cf = getTargetCFrame(mob)
+                    if cf then
+                        movementCancelled = false
+                        moveTo(cf, function()
+                            return isAlive(mob)
+                        end)
                     end
                 end
 
