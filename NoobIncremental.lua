@@ -972,6 +972,20 @@ UITab:CreateButton({
     end
 })
 
+MiscTab:CreateButton({
+    Name = "Enable Anti AFK",
+    Callback = function()
+        local VirtualUser = cloneref(game:GetService("VirtualUser"))
+        local Players = cloneref(game:GetService("Players"))
+
+        Players.LocalPlayer.Idled:Connect(function()
+            VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+            VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+        end)
+
+        print("Anti-AFK enabled.")
+    end
+})
 
 MiscTab:CreateButton({
     Name = "Print Debug Info",
