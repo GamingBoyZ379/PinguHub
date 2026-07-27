@@ -329,9 +329,9 @@ local Window = Rayfield:CreateWindow({
     LoadingTitle = "Loading PinguHub...",
     LoadingSubtitle = "Made by pengus3npai",
     ConfigurationSaving = {
-        Enabled = false,
-        FolderName = nil,
-        FileName = "NoobIncrementalConfig"
+        Enabled = true,
+        FolderName = PinguHub,
+        FileName = "NoobIncremental"
     },
     Discord = {
         Enabled = false
@@ -355,6 +355,7 @@ local CreditsTab       = Window:CreateTab("Credits")
 ---------------------------------------------------------------------
 SettingsTab:CreateDropdown({
     Name = "Movement Mode",
+	Flag = "MovementMode",
     Options = { "Teleport", "Tween", "Walk", "Legit" },
     CurrentOption = { MovementMode },
     MultipleOptions = false,
@@ -365,6 +366,7 @@ SettingsTab:CreateDropdown({
 
 SettingsTab:CreateToggle({
     Name = "Hide Rolls",
+	Flag = "HideRolls",
     CurrentValue = false,
     Callback = function(state)
         hideRollsOn = state
@@ -406,6 +408,7 @@ local autoLeaveEnabled = true
 
 AutoTrialTab:CreateDropdown({
     Name = "Trial Difficulty",
+	Flag = "TrialDifficulty",
     Options = { "Hard", "Medium", "Easy" },
     CurrentOption = { SelectedTrialDifficulty },
     MultipleOptions = false,
@@ -416,6 +419,7 @@ AutoTrialTab:CreateDropdown({
 
 AutoTrialTab:CreateSlider({
     Name = "Leave Trial At (Seconds) Left",
+	Flag = "TrialLeaveTime",
     Range = {1, 1200},
     Increment = 1,
     CurrentValue = leaveTime,
@@ -426,6 +430,7 @@ AutoTrialTab:CreateSlider({
 
 AutoTrialTab:CreateToggle({
     Name = "Auto Leave Trial",
+	Flag = "AutoLeaveTrial",
     CurrentValue = true,
     Callback = function(state)
         autoLeaveEnabled = state
@@ -434,6 +439,7 @@ AutoTrialTab:CreateToggle({
 
 AutoTrialTab:CreateToggle({
     Name = "Auto Trial",
+	Flag = "AutoTrial",
     CurrentValue = false,
     Callback = function(state)
         autoTrialOn = state
@@ -526,6 +532,7 @@ end)
 ---------------------------------------------------------------------
 OreDropdown = AutoOresTab:CreateDropdown({
     Name = "Target Ore",
+	Flag = "TargetOre",
     Options = OreList,
     CurrentOption = {},
     MultipleOptions = true,
@@ -536,6 +543,7 @@ OreDropdown = AutoOresTab:CreateDropdown({
 
 AutoOresTab:CreateToggle({
     Name = "Farm All Ores",
+	Flag = "FarmAllOres",
     CurrentValue = false,
     Callback = function(state)
         farmAllOresOn = state
@@ -618,6 +626,7 @@ AutoOresTab:CreateToggle({
 
 AutoOresTab:CreateToggle({
     Name = "Farm Selected Ore",
+	Flag = "FarmSelectedOre",
     CurrentValue = false,
     Callback = function(state)
         farmSelectedOreOn = state
@@ -679,6 +688,7 @@ AutoOresTab:CreateToggle({
 ---------------------------------------------------------------------
 MobDropdown = AutoMobsTab:CreateDropdown({
     Name = "Target Mob",
+	Flag = "TargetMob",
     Options = MobList,
     CurrentOption = {},
     MultipleOptions = true,
@@ -689,6 +699,7 @@ MobDropdown = AutoMobsTab:CreateDropdown({
 
 AutoMobsTab:CreateToggle({
     Name = "Farm All Mobs",
+	Flag = "FarmAllMobs",
     CurrentValue = false,
     Callback = function(state)
         farmAllOn = state
@@ -771,6 +782,7 @@ AutoMobsTab:CreateToggle({
 
 AutoMobsTab:CreateToggle({
     Name = "Farm Selected Mob",
+	Flag = "FarmSelectedMob",
     CurrentValue = false,
     Callback = function(state)
         farmSelectedMobOn = state
@@ -829,6 +841,7 @@ AutoMobsTab:CreateToggle({
 
 AutoMobsTab:CreateToggle({
     Name = "Auto Start Ritual",
+	Flag = "AutoRitual",
     CurrentValue = false,
     Callback = function(state)
         autoStartRitualOn = state
@@ -857,6 +870,7 @@ AutoMobsTab:CreateToggle({
 ---------------------------------------------------------------------
 CapsuleDropdown = AutoCapsulesTab:CreateDropdown({
     Name = "Capsule",
+	Flag = "TargetCapsule",
     Options = capsuleOptions,
     CurrentOption = {},
     MultipleOptions = false,
@@ -867,6 +881,7 @@ CapsuleDropdown = AutoCapsulesTab:CreateDropdown({
 
 AutoCapsulesTab:CreateToggle({
     Name = "Auto Open",
+	Flag = "AutoCapsule",
     CurrentValue = false,
     Callback = function(state)
         autoCapsuleOn = state
@@ -920,6 +935,7 @@ AutoCapsulesTab:CreateToggle({
 ---------------------------------------------------------------------
 RuneDropdown = AutoRunesTab:CreateDropdown({
     Name = "Runes",
+	Flag = "TargetRune",
     Options = runeOptions,
     CurrentOption = {},
     MultipleOptions = false,
@@ -930,6 +946,7 @@ RuneDropdown = AutoRunesTab:CreateDropdown({
 
 AutoRunesTab:CreateToggle({
     Name = "Autoroll",
+	Flag = "AutoRune",
     CurrentValue = false,
     Callback = function(state)
         autoRollOn = state
@@ -975,6 +992,7 @@ AutoRunesTab:CreateToggle({
 ---------------------------------------------------------------------
 ItemsTab:CreateToggle({
     Name = "Auto Use T1 Chest",
+	Flag = "AutoT1Chest",
     CurrentValue = false,
     Callback = function(state)
         autoT1ChestOn = state
@@ -995,6 +1013,7 @@ ItemsTab:CreateToggle({
 
 ItemsTab:CreateToggle({
     Name = "Auto Use T2 Chest",
+	Flag = "AutoT2Chest",
     CurrentValue = false,
     Callback = function(state)
         autoT2ChestOn = state
@@ -1148,14 +1167,33 @@ MiscTab:CreateButton({
     end
 })
 
-MiscTab:CreateButton({
-    Name = "Enable Anti AFK",
-    Callback = function()
+local antiAFKOn = false
+local antiAFKConnection = nil
+
+MiscTab:CreateToggle({
+    Name = "Anti AFK",
+    Flag = "AntiAFK",
+    CurrentValue = false,
+    Callback = function(state)
+        antiAFKOn = state
+
+        -- Turn OFF Anti-AFK
+        if not state then
+            if antiAFKConnection then
+                antiAFKConnection:Disconnect()
+                antiAFKConnection = nil
+            end
+            print("Anti-AFK disabled.")
+            return
+        end
+
+        -- Turn ON Anti-AFK
         local VirtualUser = cloneref(game:GetService("VirtualUser"))
         local Players = cloneref(game:GetService("Players"))
 
-        Players.LocalPlayer.Idled:Connect(function()
+        antiAFKConnection = Players.LocalPlayer.Idled:Connect(function()
             VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+            task.wait()
             VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
         end)
 
