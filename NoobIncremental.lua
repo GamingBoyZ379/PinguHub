@@ -331,7 +331,7 @@ local Window = Rayfield:CreateWindow({
     ConfigurationSaving = {
         Enabled = true,
         FolderName = "PinguHub",
-        FileName = "NoobIncremental"
+        FileName = "NoobIncrementalAutoSave"
     },
     Discord = {
         Enabled = false
@@ -348,6 +348,7 @@ local ItemsTab         = Window:CreateTab("Items")
 local UITab			   = Window:CreateTab("UI")
 local TeleportTab 	   = Window:CreateTab("Teleports")
 local MiscTab          = Window:CreateTab("Misc")
+local ConfigTab 	   = Window:CreateTab("Configs")
 local CreditsTab       = Window:CreateTab("Credits")
 
 ---------------------------------------------------------------------
@@ -1555,6 +1556,151 @@ end)
 
 Players.PlayerRemoving:Connect(markPlayerLeft)
 
+---------------------------------------------------------------------
+-- Custom Multi-Config System (Rayfield Gen1, Fully Working)
+---------------------------------------------------------------------
+
+local HttpService = game:GetService("HttpService")
+local ConfigFolder = "PinguHub/NoobIncremental"
+
+if not isfolder("PinguHub") then makefolder("PinguHub") end
+if not isfolder(ConfigFolder) then makefolder(ConfigFolder) end
+
+-- Collect all Rayfield flags + values
+local function collectFlags()
+    local data = {}
+
+    for flagName, element in pairs(Rayfield.Flags) do
+        data[flagName] = element.CurrentValue
+    end
+
+    return data
+end
+
+-- Apply config values to Rayfield UI
+local function applyFlags(data)
+    for flagName, value in pairs(data) do
+        local element = Rayfield.Flags[flagName]
+        if element then
+            if element.Set then
+                element:Set(value)
+            elseif element.SetValue then
+                element:SetValue(value)
+            end
+        end
+    end
+end
+
+-- Get list of configs
+local function getConfigs()
+    local files = listfiles(ConfigFolder)
+    local names = {}
+
+    for _, file in ipairs(files) do
+        local clean = file:match("([^/]+)%.json$")
+        if clean then table.insert(names, clean) end
+    end
+
+    return names
+end
+
+local ConfigDropdown = ConfigTab:CreateDropdown({
+    Name = "Available Configs",
+    Options = getConfigs(),
+    CurrentOption = {},
+    MultipleOptions = false,
+    Callback = function() end
+})
+
+---------------------------------------------------------------------
+-- Save Config (Button)
+---------------------------------------------------------------------
+
+local saveName = ""
+
+ConfigTab:CreateInput({
+    Name = "Config Name",
+    PlaceholderText = "Enter name",
+    RemoveTextAfterFocus = false,
+    Callback = function(text)
+        saveName = text
+    end
+})
+
+ConfigTab:CreateButton({
+    Name = "Save Config",
+    Callback = function()
+        if saveName == "" then
+            Rayfield:Notify({
+                Title = "Save Failed",
+                Content = "Enter a config name first.",
+                Duration = 5
+            })
+            return
+        end
+
+        local path = ConfigFolder .. "/" .. saveName .. ".json"
+        local flags = collectFlags()
+
+        writefile(path, HttpService:JSONEncode(flags))
+
+        Rayfield:Notify({
+            Title = "Config Saved",
+            Content = "Saved as " .. saveName,
+            Duration = 5
+        })
+
+        ConfigDropdown:Refresh(getConfigs())
+    end
+})
+
+---------------------------------------------------------------------
+-- Load Config
+---------------------------------------------------------------------
+
+ConfigTab:CreateButton({
+    Name = "Load Selected Config",
+    Callback = function()
+        local selected = ConfigDropdown.CurrentOption
+        if not selected or selected == "" then return end
+
+        local path = ConfigFolder .. "/" .. selected .. ".json"
+        if not isfile(path) then return end
+
+        local decoded = HttpService:JSONDecode(readfile(path))
+
+        applyFlags(decoded)
+
+        Rayfield:Notify({
+            Title = "Config Loaded",
+            Content = "Loaded " .. selected,
+            Duration = 5
+        })
+    end
+})
+
+---------------------------------------------------------------------
+-- Delete Config
+---------------------------------------------------------------------
+
+ConfigTab:CreateButton({
+    Name = "Delete Selected Config",
+    Callback = function()
+        local selected = ConfigDropdown.CurrentOption
+        if not selected or selected == "" then return end
+
+        local path = ConfigFolder .. "/" .. selected .. ".json"
+        if isfile(path) then delfile(path) end
+
+        Rayfield:Notify({
+            Title = "Config Deleted",
+            Content = "Deleted " .. selected,
+            Duration = 5
+        })
+
+        ConfigDropdown:Refresh(getConfigs())
+    end
+})
 
 ---------------------------------------------------------------------
 -- Credits
