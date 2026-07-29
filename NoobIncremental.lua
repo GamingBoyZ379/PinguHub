@@ -853,19 +853,20 @@ AutoMobsTab:CreateToggle({
                 if AutosPaused then task.wait(0.1) continue end
 
                 ------------------------------------------------------------------
-                -- Ritual board + CAN check
+                -- Ritual board + Timer text check
                 ------------------------------------------------------------------
                 local ritualPart = workspace.__GAME_CONTENT
                     .Contents["WORLD - 3"]
                     .RitualChamberModel
                     .MainPart
 
-                local canObj = ritualPart
+                local timerObj = ritualPart
                     and ritualPart:FindFirstChild("SurfaceGui")
                     and ritualPart.SurfaceGui:FindFirstChild("Bar")
-                    and ritualPart.SurfaceGui.Bar:FindFirstChild("CAN")
+                    and ritualPart.SurfaceGui.Bar:FindFirstChild("Timer")
 
-                if not (canObj and canObj.Enabled) then
+                -- Only try ritual when Timer.Text == "Start ritual!"
+                if not (timerObj and timerObj.Text == "Start ritual!") then
                     task.wait(0.2)
                     continue
                 end
