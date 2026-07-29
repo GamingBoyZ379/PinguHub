@@ -1678,7 +1678,7 @@ ConfigTab:CreateButton({
 
         Rayfield:Notify({
             Title = "Config Saved",
-            Content = "Saved clean autosave as " .. saveName,
+            Content = "Saved config as " .. saveName,
             Duration = 5
         })
 
