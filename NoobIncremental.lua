@@ -1482,9 +1482,6 @@ Players.PlayerRemoving:Connect(markPlayerLeft)
 ---------------------------------------------------------------------
 -- Credits
 ---------------------------------------------------------------------
-CreditsTab:CreateSection("Credits")
-CreditsTab:CreateLabel("Made by pengus3npai")
-
 CreditsTab:CreateButton({
     Name = "Join Discord Server",
     Callback = function()
@@ -1525,3 +1522,4 @@ CreditsTab:CreateButton({
         })
     end
 })
+CreditsTab:CreateLabel("Made by pengus3npai")
