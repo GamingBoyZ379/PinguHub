@@ -330,7 +330,7 @@ local Window = Rayfield:CreateWindow({
     LoadingSubtitle = "Made by pengus3npai",
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = PinguHub,
+        FolderName = "PinguHub",
         FileName = "NoobIncremental"
     },
     Discord = {
