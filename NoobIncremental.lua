@@ -1557,31 +1557,34 @@ end)
 Players.PlayerRemoving:Connect(markPlayerLeft)
 
 ---------------------------------------------------------------------
--- Custom Multi-Config System (Rayfield Gen1, Fully Working)
+-- Custom Multi‑Config System (Rayfield Gen1, Clean .rfld Copy + Safe Loader)
 ---------------------------------------------------------------------
 
 local HttpService = game:GetService("HttpService")
+
+local AutoSavePath = "PinguHub/NoobIncrementalAutoSave.rfld"
 local ConfigFolder = "PinguHub/NoobIncremental"
 
 if not isfolder("PinguHub") then makefolder("PinguHub") end
 if not isfolder(ConfigFolder) then makefolder(ConfigFolder) end
 
--- Collect all Rayfield flags + values
-local function collectFlags()
-    local data = {}
-
-    for flagName, element in pairs(Rayfield.Flags) do
-        data[flagName] = element.CurrentValue
-    end
-
-    return data
-end
-
--- Apply config values to Rayfield UI
+---------------------------------------------------------------------
+-- Apply config values to Rayfield UI (autosave format, safe for empty arrays)
+---------------------------------------------------------------------
 local function applyFlags(data)
     for flagName, value in pairs(data) do
         local element = Rayfield.Flags[flagName]
         if element then
+            -- Sanitize empty tables and single‑item arrays
+            if type(value) == "table" then
+                if #value == 0 then
+                    value = ""
+                elseif #value == 1 then
+                    value = value[1]
+                end
+            end
+
+            -- Apply safely
             if element.Set then
                 element:Set(value)
             elseif element.SetValue then
@@ -1591,19 +1594,39 @@ local function applyFlags(data)
     end
 end
 
+---------------------------------------------------------------------
+-- Resolve actual file path (fixes executor path issues)
+---------------------------------------------------------------------
+local function resolveConfigPath(name)
+    for _, file in ipairs(listfiles(ConfigFolder)) do
+        if file:lower():match(name:lower()) then
+            return file
+        end
+    end
+    return nil
+end
+
+---------------------------------------------------------------------
 -- Get list of configs
+---------------------------------------------------------------------
 local function getConfigs()
     local files = listfiles(ConfigFolder)
     local names = {}
 
     for _, file in ipairs(files) do
-        local clean = file:match("([^/]+)%.json$")
-        if clean then table.insert(names, clean) end
+        -- Extract ONLY the filename without folder path
+        local clean = file:match("([^/\\]+)%.json$")
+        if clean then
+            table.insert(names, clean)
+        end
     end
 
     return names
 end
 
+---------------------------------------------------------------------
+-- Create Config Tab
+---------------------------------------------------------------------
 local ConfigDropdown = ConfigTab:CreateDropdown({
     Name = "Available Configs",
     Options = getConfigs(),
@@ -1613,9 +1636,8 @@ local ConfigDropdown = ConfigTab:CreateDropdown({
 })
 
 ---------------------------------------------------------------------
--- Save Config (Button)
+-- Save Config (copy autosave .rfld)
 ---------------------------------------------------------------------
-
 local saveName = ""
 
 ConfigTab:CreateInput({
@@ -1639,14 +1661,24 @@ ConfigTab:CreateButton({
             return
         end
 
-        local path = ConfigFolder .. "/" .. saveName .. ".json"
-        local flags = collectFlags()
+        if not isfile(AutoSavePath) then
+            Rayfield:Notify({
+                Title = "Save Failed",
+                Content = "AutoSave file not found.",
+                Duration = 5
+            })
+            return
+        end
 
-        writefile(path, HttpService:JSONEncode(flags))
+        local raw = readfile(AutoSavePath)
+        local decoded = HttpService:JSONDecode(raw)
+
+        local path = ConfigFolder .. "/" .. saveName .. ".json"
+        writefile(path, HttpService:JSONEncode(decoded))
 
         Rayfield:Notify({
             Title = "Config Saved",
-            Content = "Saved as " .. saveName,
+            Content = "Saved clean autosave as " .. saveName,
             Duration = 5
         })
 
@@ -1657,23 +1689,37 @@ ConfigTab:CreateButton({
 ---------------------------------------------------------------------
 -- Load Config
 ---------------------------------------------------------------------
-
 ConfigTab:CreateButton({
     Name = "Load Selected Config",
     Callback = function()
-        local selected = ConfigDropdown.CurrentOption[1]
-        if not selected or selected == "" then return end
+        local selectedTable = ConfigDropdown.CurrentOption
+        local selected = (type(selectedTable) == "table" and selectedTable[1]) or selectedTable
 
-        local path = ConfigFolder .. "/" .. selected .. ".json"
-        if not isfile(path) then return end
+        if not selected or selected == "" then
+            Rayfield:Notify({
+                Title = "Load Failed",
+                Content = "Select a config first.",
+                Duration = 5
+            })
+            return
+        end
+
+        local path = resolveConfigPath(selected)
+        if not path or not isfile(path) then
+            Rayfield:Notify({
+                Title = "Load Failed",
+                Content = "Config file not found.",
+                Duration = 5
+            })
+            return
+        end
 
         local decoded = HttpService:JSONDecode(readfile(path))
-
         applyFlags(decoded)
 
         Rayfield:Notify({
             Title = "Config Loaded",
-            Content = "Loaded " .. selected,
+            Content = "Loaded " .. tostring(selected),
             Duration = 5
         })
     end
@@ -1682,19 +1728,36 @@ ConfigTab:CreateButton({
 ---------------------------------------------------------------------
 -- Delete Config
 ---------------------------------------------------------------------
-
 ConfigTab:CreateButton({
     Name = "Delete Selected Config",
     Callback = function()
-        local selected = ConfigDropdown.CurrentOption[1]
-        if not selected or selected == "" then return end
+        local selectedTable = ConfigDropdown.CurrentOption
+        local selected = (type(selectedTable) == "table" and selectedTable[1]) or selectedTable
 
-        local path = ConfigFolder .. "/" .. selected .. ".json"
-        if isfile(path) then delfile(path) end
+        if not selected or selected == "" then
+            Rayfield:Notify({
+                Title = "Delete Failed",
+                Content = "Select a config first.",
+                Duration = 5
+            })
+            return
+        end
+
+        local path = resolveConfigPath(selected)
+        if not path or not isfile(path) then
+            Rayfield:Notify({
+                Title = "Delete Failed",
+                Content = "Config file not found.",
+                Duration = 5
+            })
+            return
+        end
+
+        delfile(path)
 
         Rayfield:Notify({
             Title = "Config Deleted",
-            Content = "Deleted " .. selected,
+            Content = "Deleted " .. tostring(selected),
             Duration = 5
         })
 
