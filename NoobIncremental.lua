@@ -852,19 +852,19 @@ AutoMobsTab:CreateToggle({
                 updateAutoPauseState()
                 if AutosPaused then task.wait(0.1) continue end
 
-                -- Ritual board path
+                ------------------------------------------------------------------
+                -- Ritual board + CAN check
+                ------------------------------------------------------------------
                 local ritualPart = workspace.__GAME_CONTENT
                     .Contents["WORLD - 3"]
                     .RitualChamberModel
                     .MainPart
 
-                -- CAN indicator
                 local canObj = ritualPart
                     and ritualPart:FindFirstChild("SurfaceGui")
                     and ritualPart.SurfaceGui:FindFirstChild("Bar")
                     and ritualPart.SurfaceGui.Bar:FindFirstChild("CAN")
 
-                -- Only try ritual when CAN.Enabled == true
                 if not (canObj and canObj.Enabled) then
                     task.wait(0.2)
                     continue
@@ -875,7 +875,11 @@ AutoMobsTab:CreateToggle({
                     local dist = (root.Position - ritualPart.Position).Magnitude
                     local mode = normalizeMode(MovementMode)
 
-                    -- Move to ritual board using selected movement mode
+                    ------------------------------------------------------------------
+                    -- PAUSE autos while moving to ritual
+                    ------------------------------------------------------------------
+                    AutosPaused = true
+
                     if dist > 10 then
                         movementCancelled = false
 
@@ -883,21 +887,27 @@ AutoMobsTab:CreateToggle({
                             moveTo(ritualPart.CFrame, nil)
                         else
                             moveTo(ritualPart.CFrame, function()
-                                -- Always true; ritualPart doesn't "die"
-                                return true
+                                return true -- ritualPart never "dies"
                             end)
                         end
-
-                        task.wait(0.2)
                     end
 
-                    -- Fire ritual remote once in range
+                    task.wait(0.2)
+
+                    ------------------------------------------------------------------
+                    -- Fire ritual remote AFTER movement finishes
+                    ------------------------------------------------------------------
                     local Net = RS:FindFirstChild("__Net")
                     local Event = Net and Net:FindFirstChild("MainRemote")
 
                     if Event then
                         Event:FireServer("StartRitual")
                     end
+
+                    ------------------------------------------------------------------
+                    -- UNPAUSE autos after firing ritual
+                    ------------------------------------------------------------------
+                    AutosPaused = false
                 end
 
                 task.wait(1)
