@@ -1661,7 +1661,7 @@ ConfigTab:CreateButton({
 ConfigTab:CreateButton({
     Name = "Load Selected Config",
     Callback = function()
-        local selected = ConfigDropdown.CurrentOption
+        local selected = ConfigDropdown.CurrentOption[1]
         if not selected or selected == "" then return end
 
         local path = ConfigFolder .. "/" .. selected .. ".json"
@@ -1686,7 +1686,7 @@ ConfigTab:CreateButton({
 ConfigTab:CreateButton({
     Name = "Delete Selected Config",
     Callback = function()
-        local selected = ConfigDropdown.CurrentOption
+        local selected = ConfigDropdown.CurrentOption[1]
         if not selected or selected == "" then return end
 
         local path = ConfigFolder .. "/" .. selected .. ".json"
