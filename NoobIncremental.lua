@@ -841,7 +841,7 @@ AutoMobsTab:CreateToggle({
 
 AutoMobsTab:CreateToggle({
     Name = "Auto Start Ritual",
-	Flag = "AutoRitual",
+    Flag = "AutoRitual",
     CurrentValue = false,
     Callback = function(state)
         autoStartRitualOn = state
@@ -852,14 +852,55 @@ AutoMobsTab:CreateToggle({
                 updateAutoPauseState()
                 if AutosPaused then task.wait(0.1) continue end
 
-                local Net = RS:FindFirstChild("__Net")
-                local Event = Net and Net:FindFirstChild("MainRemote")
+                -- Ritual board path
+                local ritualPart = workspace.__GAME_CONTENT
+                    .Contents["WORLD - 3"]
+                    .RitualChamberModel
+                    .MainPart
 
-                if Event then
-                    Event:FireServer("StartRitual")
+                -- CAN indicator
+                local canObj = ritualPart
+                    and ritualPart:FindFirstChild("SurfaceGui")
+                    and ritualPart.SurfaceGui:FindFirstChild("Bar")
+                    and ritualPart.SurfaceGui.Bar:FindFirstChild("CAN")
+
+                -- Only try ritual when CAN.Enabled == true
+                if not (canObj and canObj.Enabled) then
+                    task.wait(0.2)
+                    continue
                 end
 
-                task.wait(1) -- adjust if needed
+                local root = getRoot()
+                if ritualPart and root then
+                    local dist = (root.Position - ritualPart.Position).Magnitude
+                    local mode = normalizeMode(MovementMode)
+
+                    -- Move to ritual board using selected movement mode
+                    if dist > 10 then
+                        movementCancelled = false
+
+                        if mode == "Legit" then
+                            moveTo(ritualPart.CFrame, nil)
+                        else
+                            moveTo(ritualPart.CFrame, function()
+                                -- Always true; ritualPart doesn't "die"
+                                return true
+                            end)
+                        end
+
+                        task.wait(0.2)
+                    end
+
+                    -- Fire ritual remote once in range
+                    local Net = RS:FindFirstChild("__Net")
+                    local Event = Net and Net:FindFirstChild("MainRemote")
+
+                    if Event then
+                        Event:FireServer("StartRitual")
+                    end
+                end
+
+                task.wait(1)
             end
         end)
     end
