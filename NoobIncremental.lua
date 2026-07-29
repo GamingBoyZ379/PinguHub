@@ -865,7 +865,6 @@ AutoMobsTab:CreateToggle({
                     and ritualPart.SurfaceGui:FindFirstChild("Bar")
                     and ritualPart.SurfaceGui.Bar:FindFirstChild("Timer")
 
-                -- Only try ritual when Timer.Text == "Start ritual!"
                 if not (timerObj and timerObj.Text == "Start ritual!") then
                     task.wait(0.2)
                     continue
@@ -877,10 +876,8 @@ AutoMobsTab:CreateToggle({
                     local mode = normalizeMode(MovementMode)
 
                     ------------------------------------------------------------------
-                    -- PAUSE autos while moving to ritual
+                    -- MOVE FIRST (Teleport/Tween/Walk/Legit all work)
                     ------------------------------------------------------------------
-                    AutosPaused = true
-
                     if dist > 10 then
                         movementCancelled = false
 
@@ -888,7 +885,7 @@ AutoMobsTab:CreateToggle({
                             moveTo(ritualPart.CFrame, nil)
                         else
                             moveTo(ritualPart.CFrame, function()
-                                return true -- ritualPart never "dies"
+                                return true
                             end)
                         end
                     end
@@ -896,7 +893,12 @@ AutoMobsTab:CreateToggle({
                     task.wait(0.2)
 
                     ------------------------------------------------------------------
-                    -- Fire ritual remote AFTER movement finishes
+                    -- NOW PAUSE AUTOS (AFTER movement)
+                    ------------------------------------------------------------------
+                    AutosPaused = true
+
+                    ------------------------------------------------------------------
+                    -- Fire ritual remote
                     ------------------------------------------------------------------
                     local Net = RS:FindFirstChild("__Net")
                     local Event = Net and Net:FindFirstChild("MainRemote")
@@ -906,7 +908,7 @@ AutoMobsTab:CreateToggle({
                     end
 
                     ------------------------------------------------------------------
-                    -- UNPAUSE autos after firing ritual
+                    -- UNPAUSE AUTOS
                     ------------------------------------------------------------------
                     AutosPaused = false
                 end
