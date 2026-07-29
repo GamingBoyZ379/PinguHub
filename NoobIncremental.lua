@@ -1363,8 +1363,31 @@ local fragLabels = {}        -- Rayfield label objects
 local lastFragValues = {}    -- saved fragment values
 local Players = game:GetService("Players")
 
-local RayfieldMisc = game:GetService("CoreGui")
-    .RobloxGui.Rayfield.Main.Elements.Misc
+local CoreGui = game:GetService("CoreGui")
+
+local function findRayfield()
+    -- Search every descendant for an Instance named "Rayfield"
+    for _, obj in ipairs(CoreGui:GetDescendants()) do
+        if obj.Name == "Rayfield" then
+            return obj
+        end
+    end
+    return nil
+end
+
+local RayfieldGui = findRayfield()
+
+local RayfieldMisc = nil
+if RayfieldGui then
+    -- Safely walk the tree (mobile-safe)
+    local main = RayfieldGui:FindFirstChild("Main")
+    if main then
+        local elements = main:FindFirstChild("Elements")
+        if elements then
+            RayfieldMisc = elements:FindFirstChild("Misc")
+        end
+    end
+end
 
 ---------------------------------------------------------------------
 -- Helpers
