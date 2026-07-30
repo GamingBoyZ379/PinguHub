@@ -326,6 +326,7 @@ RuneZones.ChildAdded:Connect(refreshRuneList)
 ---------------------------------------------------------------------
 local Window = Rayfield:CreateWindow({
     Name = "Noob Incremental Script",
+	ScriptID = "sid_60s62o8qva9e",
     LoadingTitle = "Loading PinguHub...",
     LoadingSubtitle = "Made by pengus3npai",
     ConfigurationSaving = {
