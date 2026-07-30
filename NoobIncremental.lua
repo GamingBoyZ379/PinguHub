@@ -345,6 +345,7 @@ local AutoOresTab      = Window:CreateTab("AutoOres")
 local AutoMobsTab      = Window:CreateTab("AutoMobs")
 local AutoCapsulesTab  = Window:CreateTab("AutoCapsules")
 local AutoRunesTab     = Window:CreateTab("AutoRunes")
+local AutoUpgradesTab      = Window:CreateTab("AutoUpgrades")
 local ItemsTab         = Window:CreateTab("Items")
 local UITab			   = Window:CreateTab("UI")
 local TeleportTab 	   = Window:CreateTab("Teleports")
@@ -395,6 +396,31 @@ SettingsTab:CreateToggle({
                     if main then
                         local container = main:FindFirstChild("Container")
                         if container then container.Visible = true end
+                    end
+                end
+            end
+        end)
+    end
+})
+
+SettingsTab:CreateToggle({
+    Name = "Hide Error Popups",
+    Flag = "HideErrors",
+    CurrentValue = false,
+    Callback = function(state)
+        getgenv().HideErrors = state
+
+        if not state then return end
+
+        task.spawn(function()
+            local Popups = game:GetService("Players").LocalPlayer.PlayerGui.FullScreen.Popups
+
+            while HideErrors do
+                task.wait(0.1)
+
+                for _, popup in ipairs(Popups:GetChildren()) do
+                    if popup.Name == "ErrorTemplate" then
+                        popup.Visible = false
                     end
                 end
             end
@@ -1042,6 +1068,223 @@ AutoRunesTab:CreateToggle({
         end)
     end
 })
+
+---------------------------------------------------------------------
+-- AutoUpgrades Tab
+---------------------------------------------------------------------
+
+AutoUpgradesTab:CreateToggle({
+    Name = "Auto Prestige",
+    Flag = "AutoPrestige",
+    CurrentValue = false,
+    Callback = function(state)
+        getgenv().AutoPrestige = state
+
+        if not state then return end
+
+        task.spawn(function()
+            local Player = game:GetService("Players").LocalPlayer
+            local Event = game:GetService("ReplicatedStorage").__Net.MainRemote
+
+            while AutoPrestige do
+                task.wait(1)
+
+                local gui = Player.PlayerGui.FullScreen
+                local prestigeBar = gui:FindFirstChild("PrestigeBar")
+
+                if prestigeBar and prestigeBar:FindFirstChild("CanPrestige") then
+                    if prestigeBar.CanPrestige.Visible == true then
+                        Event:FireServer("Prestige")
+                    end
+                end
+            end
+        end)
+    end
+})
+
+local UpgradeSection = AutoUpgradesTab:CreateSection("Noob Upgrades")
+
+local function getNoobList()
+    local folder = workspace.__GAME_CONTENT:FindFirstChild("Noobs")
+    local list = {}
+
+    if folder then
+        for _, noob in ipairs(folder:GetChildren()) do
+            table.insert(list, noob.Name)
+        end
+    end
+
+    return list
+end
+
+local SelectedNoobs = {}
+
+local NoobDropdown = AutoUpgradesTab:CreateDropdown({
+    Name = "Select Noobs",
+    Options = getNoobList(),
+    CurrentOption = {},
+    MultipleOptions = true,
+    Flag = "SelectedUpgradeNoobs",
+    Callback = function(options)
+        SelectedNoobs = options
+    end
+})
+
+AutoUpgradesTab:CreateToggle({
+    Name = "Auto Upgrade Selected Noobs",
+    Flag = "AutoUpgradeNoobs",
+    CurrentValue = false,
+    Callback = function(state)
+        getgenv().AutoUpgradeNoobs = state
+
+        if not state then return end
+
+        task.spawn(function()
+            local RS = game:GetService("ReplicatedStorage")
+            local Event = RS.__Net.MainRemote
+
+            while AutoUpgradeNoobs do
+                task.wait()
+
+                if #SelectedNoobs == 0 then
+                    continue
+                end
+
+                for _, noobName in ipairs(SelectedNoobs) do
+                    Event:FireServer("UpgradeNoob", noobName)
+                    task.wait()
+                end
+            end
+        end)
+    end
+})
+
+---------------------------------------------------------------------
+-- Dynamic Currency Upgrade Sections (inside AutoUpgrades tab)
+---------------------------------------------------------------------
+
+local Player = game:GetService("Players").LocalPlayer
+local RS = game:GetService("ReplicatedStorage")
+local Event = RS.__Net.MainRemote
+local WorldUI = Player.PlayerGui:WaitForChild("WorldUI")
+
+---------------------------------------------------------------------
+-- Desired currency order
+---------------------------------------------------------------------
+
+local CurrencyOrder = {
+    "Oof","Rebirth","Goals","Fire","Blaze","Cash","Bread","Coin","Hackpoints",
+    "Water","Ice","Wood","Planks","Gems","Meat","Bones","Souls","Sand"
+}
+
+---------------------------------------------------------------------
+-- Detect all upgrade boards: Upgrades..Oof, Upgrades..Meat, etc.
+---------------------------------------------------------------------
+
+local function getUpgradeBoards()
+    local boards = {}
+
+    for _, ui in ipairs(WorldUI:GetChildren()) do
+        if ui.Name:match("^Upgrades%.%.") then
+            local currency = ui.Name:gsub("Upgrades%.%.", "")
+            boards[currency] = ui
+        end
+    end
+
+    return boards
+end
+
+local UpgradeBoards = getUpgradeBoards()
+
+---------------------------------------------------------------------
+-- Get upgrade list for a currency (only visible upgrade frames)
+---------------------------------------------------------------------
+
+local function getUpgradeList(board)
+    local list = {}
+
+    if board:FindFirstChild("Main") and board.Main.Visible == true then
+        for _, upgrade in ipairs(board.Main:GetChildren()) do
+            -- Only include Frames that are visible and not named "Filler"
+            if upgrade:IsA("Frame") and upgrade.Visible == true and upgrade.Name ~= "Filler" then
+                table.insert(list, upgrade.Name)
+            end
+        end
+    end
+
+    return list
+end
+
+---------------------------------------------------------------------
+-- Auto-buy loop for a specific currency
+---------------------------------------------------------------------
+
+local function startAutoBuy(currency, selectedFlag)
+    task.spawn(function()
+        while getgenv()[currency .. "_AutoBuy"] do
+            task.wait(0.5)
+
+            local board = UpgradeBoards[currency]
+            if not board then continue end
+
+            local selected = Rayfield.Flags[selectedFlag].CurrentValue
+            if type(selected) ~= "table" or #selected == 0 then continue end
+
+            local currencyObj = Player.CURRENCIES:FindFirstChild(currency)
+            if not currencyObj then continue end
+
+            local amount = tonumber(currencyObj.Amount["1"]) or 0
+
+            for _, upgradeName in ipairs(selected) do
+                local upgradeUI = board.Main:FindFirstChild(upgradeName)
+                if upgradeUI and upgradeUI:FindFirstChild("Cost") and upgradeUI.Cost:FindFirstChild("Amount") then
+                    local cost = tonumber(upgradeUI.Cost.Amount.Text) or 0
+
+                    if amount >= cost then
+                        Event:FireServer("UpgradeUpgrade", currency, upgradeName)
+                        task.wait(0.1)
+                    end
+                end
+            end
+        end
+    end)
+end
+
+---------------------------------------------------------------------
+-- Build UI sections dynamically inside AutoUpgrades tab
+---------------------------------------------------------------------
+
+for _, currency in ipairs(CurrencyOrder) do
+    local board = UpgradeBoards[currency]
+    if board then
+        local section = AutoUpgradesTab:CreateSection(currency .. " Upgrades")
+
+        local upgrades = getUpgradeList(board)
+
+        AutoUpgradesTab:CreateDropdown({
+            Name = "Select " .. currency .. " Upgrades",
+            Options = upgrades,
+            CurrentOption = {},
+            MultipleOptions = true,
+            Flag = currency .. "_SelectedUpgrades",
+            Callback = function(options)
+                -- Rayfield handles storing selected upgrades
+            end
+        })
+
+        AutoUpgradesTab:CreateToggle({
+            Name = "Auto Buy " .. currency .. " Upgrades",
+            Flag = currency .. "_AutoBuy",
+            CurrentValue = false,
+            Callback = function(state)
+                getgenv()[currency .. "_AutoBuy"] = state
+                if state then
+                    startAutoBuy(currency, currency .. "_SelectedUpgrades")
+                end
+            end
+        })
+    end
+end
 
 ---------------------------------------------------------------------
 -- Items
