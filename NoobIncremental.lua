@@ -135,7 +135,7 @@ local function getTargetCFrame(obj)
 end
 
 ---------------------------------------------------------------------
--- Movement (Legit ignores aliveCheckFn intentionally)
+-- Movement
 ---------------------------------------------------------------------
 local function moveTo(cframe, aliveCheckFn)
     movementCancelled = false
@@ -345,7 +345,7 @@ local AutoOresTab      = Window:CreateTab("AutoOres")
 local AutoMobsTab      = Window:CreateTab("AutoMobs")
 local AutoCapsulesTab  = Window:CreateTab("AutoCapsules")
 local AutoRunesTab     = Window:CreateTab("AutoRunes")
-local AutoUpgradesTab      = Window:CreateTab("AutoUpgrades")
+local AutoUpgradesTab  = Window:CreateTab("AutoUpgrades")
 local ItemsTab         = Window:CreateTab("Items")
 local UITab			   = Window:CreateTab("UI")
 local TeleportTab 	   = Window:CreateTab("Teleports")
