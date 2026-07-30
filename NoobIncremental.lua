@@ -1102,65 +1102,8 @@ AutoUpgradesTab:CreateToggle({
     end
 })
 
-local UpgradeSection = AutoUpgradesTab:CreateSection("Noob Upgrades")
-
-local function getNoobList()
-    local folder = workspace.__GAME_CONTENT:FindFirstChild("Noobs")
-    local list = {}
-
-    if folder then
-        for _, noob in ipairs(folder:GetChildren()) do
-            table.insert(list, noob.Name)
-        end
-    end
-
-    return list
-end
-
-local SelectedNoobs = {}
-
-local NoobDropdown = AutoUpgradesTab:CreateDropdown({
-    Name = "Select Noobs",
-    Options = getNoobList(),
-    CurrentOption = {},
-    MultipleOptions = true,
-    Flag = "SelectedUpgradeNoobs",
-    Callback = function(options)
-        SelectedNoobs = options
-    end
-})
-
-AutoUpgradesTab:CreateToggle({
-    Name = "Auto Upgrade Selected Noobs",
-    Flag = "AutoUpgradeNoobs",
-    CurrentValue = false,
-    Callback = function(state)
-        getgenv().AutoUpgradeNoobs = state
-
-        if not state then return end
-
-        task.spawn(function()
-            local RS = game:GetService("ReplicatedStorage")
-            local Event = RS.__Net.MainRemote
-
-            while AutoUpgradeNoobs do
-                task.wait()
-
-                if #SelectedNoobs == 0 then
-                    continue
-                end
-
-                for _, noobName in ipairs(SelectedNoobs) do
-                    Event:FireServer("UpgradeNoob", noobName)
-                    task.wait()
-                end
-            end
-        end)
-    end
-})
-
 ---------------------------------------------------------------------
--- Dynamic Currency Upgrade Sections (inside AutoUpgrades tab)
+-- FIXED AUTO UPGRADES (Callback-Based Selection)
 ---------------------------------------------------------------------
 
 local Player = game:GetService("Players").LocalPlayer
@@ -1168,81 +1111,109 @@ local RS = game:GetService("ReplicatedStorage")
 local Event = RS.__Net.MainRemote
 local WorldUI = Player.PlayerGui:WaitForChild("WorldUI")
 
+local SelectedUpgrades = {} -- store per-currency selections
+
 ---------------------------------------------------------------------
--- Desired currency order
+-- SUFFIX PARSER
 ---------------------------------------------------------------------
 
-local CurrencyOrder = {
-    "Oof","Rebirth","Goals","Fire","Blaze","Cash","Bread","Coin","Hackpoints",
-    "Water","Ice","Wood","Planks","Gems","Meat","Bones","Souls","Sand"
+local suffixes = {
+    k = 1e3, M = 1e6, B = 1e9, T = 1e12,
+    Qd = 1e15, Qn = 1e18, Sx = 1e21, Sp = 1e24,
+    Oc = 1e27, No = 1e30,
+    De = 1e33, UDe = 1e36, DDe = 1e39, TDe = 1e42,
+    QdDe = 1e45, QnDe = 1e48, SxDe = 1e51, SpDe = 1e54,
+    OcDe = 1e57, NoDe = 1e60,
+    Vt = 1e63, UVt = 1e66, DVt = 1e69, TVt = 1e72,
+    QdVt = 1e75, QnVt = 1e78, SxVt = 1e81, SpVt = 1e84,
+    OcVt = 1e87, NoVt = 1e90,
+    Tg = 1e93, UTg = 1e96, DTg = 1e99, TTg = 1e102,
+    QdTg = 1e105, QnTg = 1e108, SxTg = 1e111, SpTg = 1e114,
+    OcTg = 1e117, NoTg = 1e120,
 }
 
+local function parseNumber(str)
+    local n = tonumber(str)
+    if n then return n end
+    local base, suf = str:match("([%d%.]+)(%a+)")
+    if base and suf and suffixes[suf] then
+        return tonumber(base) * suffixes[suf]
+    end
+    return 0
+end
+
 ---------------------------------------------------------------------
--- Detect all upgrade boards: Upgrades..Oof, Upgrades..Meat, etc.
+-- CURRENCY READER
+---------------------------------------------------------------------
+
+local function readCurrencyAmount(currencyObj)
+    local amtObj = currencyObj:FindFirstChild("Amount")
+    local child = amtObj and amtObj:FindFirstChild("1")
+    return tonumber(child and (child.Value or child.Text)) or 0
+end
+
+---------------------------------------------------------------------
+-- COST READER
+---------------------------------------------------------------------
+
+local function readUpgradeCost(upgradeUI)
+    local amtObj = upgradeUI.Cost:FindFirstChild("Amount")
+    return parseNumber(amtObj.Text)
+end
+
+---------------------------------------------------------------------
+-- UPGRADE BOARDS
 ---------------------------------------------------------------------
 
 local function getUpgradeBoards()
     local boards = {}
-
     for _, ui in ipairs(WorldUI:GetChildren()) do
         if ui.Name:match("^Upgrades%.%.") then
-            local currency = ui.Name:gsub("Upgrades%.%.", "")
-            boards[currency] = ui
+            boards[ui.Name:gsub("Upgrades%.%.", "")] = ui
         end
     end
-
     return boards
 end
 
 local UpgradeBoards = getUpgradeBoards()
 
 ---------------------------------------------------------------------
--- Get upgrade list for a currency (only visible upgrade frames)
+-- UPGRADE LIST
 ---------------------------------------------------------------------
 
 local function getUpgradeList(board)
     local list = {}
-
-    if board:FindFirstChild("Main") and board.Main.Visible == true then
-        for _, upgrade in ipairs(board.Main:GetChildren()) do
-            -- Only include Frames that are visible and not named "Filler"
-            if upgrade:IsA("Frame") and upgrade.Visible == true and upgrade.Name ~= "Filler" then
-                table.insert(list, upgrade.Name)
-            end
+    if not board.Main.Visible then return list end
+    for _, child in ipairs(board.Main:GetChildren()) do
+        if child:IsA("Frame") and child.Visible and child.Name ~= "Filler" then
+            table.insert(list, child.Name)
         end
     end
-
     return list
 end
 
 ---------------------------------------------------------------------
--- Auto-buy loop for a specific currency
+-- AUTO BUY LOOP
 ---------------------------------------------------------------------
 
-local function startAutoBuy(currency, selectedFlag)
+local function startAutoBuy(currency)
     task.spawn(function()
         while getgenv()[currency .. "_AutoBuy"] do
-            task.wait(0.5)
+            task.wait(0.2)
+
+            local selected = SelectedUpgrades[currency]
+            if not selected or #selected == 0 then continue end
 
             local board = UpgradeBoards[currency]
-            if not board then continue end
-
-            local selected = Rayfield.Flags[selectedFlag].CurrentValue
-            if type(selected) ~= "table" or #selected == 0 then continue end
-
             local currencyObj = Player.CURRENCIES:FindFirstChild(currency)
-            if not currencyObj then continue end
-
-            local amount = tonumber(currencyObj.Amount["1"]) or 0
+            local amount = readCurrencyAmount(currencyObj)
 
             for _, upgradeName in ipairs(selected) do
                 local upgradeUI = board.Main:FindFirstChild(upgradeName)
-                if upgradeUI and upgradeUI:FindFirstChild("Cost") and upgradeUI.Cost:FindFirstChild("Amount") then
-                    local cost = tonumber(upgradeUI.Cost.Amount.Text) or 0
-
+                if upgradeUI then
+                    local cost = readUpgradeCost(upgradeUI)
                     if amount >= cost then
                         Event:FireServer("UpgradeUpgrade", currency, upgradeName)
-                        task.wait(0.1)
                     end
                 end
             end
@@ -1251,40 +1222,42 @@ local function startAutoBuy(currency, selectedFlag)
 end
 
 ---------------------------------------------------------------------
--- Build UI sections dynamically inside AutoUpgrades tab
+-- UI CREATION
 ---------------------------------------------------------------------
 
+local CurrencyOrder = {
+    "Oof","Rebirth","Goals","Fire","Blaze","Cash","Bread","Coin","HackPoints",
+    "Water","Ice","Wood","Planks","Gem","Meat","Bones","Souls","Sand"
+}
+
 for _, currency in ipairs(CurrencyOrder) do
+
+    AutoUpgradesTab:CreateSection(currency .. " Upgrades")
+
     local board = UpgradeBoards[currency]
-    if board then
-        local section = AutoUpgradesTab:CreateSection(currency .. " Upgrades")
+    local upgrades = getUpgradeList(board)
 
-        local upgrades = getUpgradeList(board)
+    AutoUpgradesTab:CreateDropdown({
+        Name = currency .. " Upgrade List",
+        Options = upgrades,
+        MultipleOptions = true,
+        CurrentOption = {},
+        Callback = function(selected)
+            SelectedUpgrades[currency] = selected
+        end
+    })
 
-        AutoUpgradesTab:CreateDropdown({
-            Name = "Select " .. currency .. " Upgrades",
-            Options = upgrades,
-            CurrentOption = {},
-            MultipleOptions = true,
-            Flag = currency .. "_SelectedUpgrades",
-            Callback = function(options)
-                -- Rayfield handles storing selected upgrades
-            end
-        })
-
-        AutoUpgradesTab:CreateToggle({
-            Name = "Auto Buy " .. currency .. " Upgrades",
-            Flag = currency .. "_AutoBuy",
-            CurrentValue = false,
-            Callback = function(state)
-                getgenv()[currency .. "_AutoBuy"] = state
-                if state then
-                    startAutoBuy(currency, currency .. "_SelectedUpgrades")
-                end
-            end
-        })
-    end
+    AutoUpgradesTab:CreateToggle({
+        Name = "Auto Buy " .. currency,
+        Flag = currency .. "_AutoBuy",
+        CurrentValue = false,
+        Callback = function(state)
+            getgenv()[currency .. "_AutoBuy"] = state
+            if state then startAutoBuy(currency) end
+        end
+    })
 end
+
 
 ---------------------------------------------------------------------
 -- Items
@@ -1501,15 +1474,24 @@ MiscTab:CreateToggle({
 })
 
 MiscTab:CreateButton({
+    Name = "Load Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+
+MiscTab:CreateButton({
     Name = "Print Debug Info",
     Callback = function()
         print("===== DEBUG INFO =====")
 
-        -- Movement + Trial
+        ---------------------------------------------------------------------
+        -- Movement + Trial (your original)
+        ---------------------------------------------------------------------
         print("MovementMode:", MovementMode)
         print("SelectedTrialDifficulty:", SelectedTrialDifficulty)
 
-        -- Trial status
         local ts = RS:FindFirstChild("TrialsStatus")
         if ts and ts:FindFirstChild(SelectedTrialDifficulty) then
             print("TimeLeft:", ts[SelectedTrialDifficulty].TimeLeft.Value)
@@ -1520,11 +1502,13 @@ MiscTab:CreateButton({
             print("TimeLeft: <invalid difficulty>")
         end
 
-		print("AutoLeaveTime", leaveTime)
+        print("AutoLeaveTime:", leaveTime)
         print("TrialActive:", TrialActive)
         print("AutosPaused:", AutosPaused)
 
-        -- Toggles
+        ---------------------------------------------------------------------
+        -- Toggles (your original)
+        ---------------------------------------------------------------------
         print("autoTrialOn:", autoTrialOn)
         print("autoLeaveEnabled:", autoLeaveEnabled)
         print("farmAllOn:", farmAllOn)
@@ -1537,21 +1521,74 @@ MiscTab:CreateButton({
         print("autoT2ChestOn:", autoT2ChestOn)
         print("hideRollsOn:", hideRollsOn)
 
-        -- Dropdown selections
+        ---------------------------------------------------------------------
+        -- Dropdown selections (your original)
+        ---------------------------------------------------------------------
         print("SelectedMob:", SelectedMob)
         print("SelectedOre:", SelectedOre)
         print("SelectedCapsule:", SelectedCapsule)
         print("SelectedRune:", SelectedRune)
 
-        -- Lists
+        ---------------------------------------------------------------------
+        -- Lists (your original)
+        ---------------------------------------------------------------------
         print("MobList:", MobList)
         print("OreList:", OreList)
         print("CapsuleOptions:", capsuleOptions)
         print("RuneOptions:", runeOptions)
 
+        ---------------------------------------------------------------------
+        -- Auto Prestige
+        ---------------------------------------------------------------------
+        print("AutoPrestige:", getgenv().AutoPrestige)
+
+        local gui = Player.PlayerGui.FullScreen
+        local bar = gui:FindFirstChild("PrestigeBar")
+        if bar and bar:FindFirstChild("CanPrestige") then
+            print("CanPrestige.Visible:", bar.CanPrestige.Visible)
+        else
+            print("PrestigeBar: <missing>")
+        end
+
+        ---------------------------------------------------------------------
+        -- Hide Errors
+        ---------------------------------------------------------------------
+        print("HideErrors:", getgenv().HideErrors)
+
+        ---------------------------------------------------------------------
+        -- Noob Auto Upgrades
+        ---------------------------------------------------------------------
+        print("AutoUpgradeNoobs:", getgenv().AutoUpgradeNoobs)
+        print("SelectedUpgradeNoobs:", SelectedNoobs)
+
+        ---------------------------------------------------------------------
+        -- Currency Auto Upgrades
+        ---------------------------------------------------------------------
+        for _, currency in ipairs(CurrencyOrder) do
+            local autoFlag = currency .. "_AutoBuy"
+            local selectedFlag = currency .. "_SelectedUpgrades"
+
+            print("---- " .. currency .. " ----")
+            print(currency .. "_AutoBuy:", getgenv()[autoFlag])
+
+            if Rayfield.Flags[selectedFlag] then
+                print(currency .. "_SelectedUpgrades:", Rayfield.Flags[selectedFlag].CurrentValue)
+            else
+                print(currency .. "_SelectedUpgrades: <no flag>")
+            end
+
+            local curObj = Player.CURRENCIES:FindFirstChild(currency)
+            if curObj then
+                print(currency .. "_Amount:", readCurrencyAmount(curObj))
+            else
+                print(currency .. "_Amount: <missing currency object>")
+            end
+        end
+
         print("===== END DEBUG =====")
     end
 })
+
 
 local streamerModeOn = false
 local spoofSelf = "@PinguHub User"
