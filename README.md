@@ -23,4 +23,4 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/GamingBoyZ379/PinguHu
 
 🔴 Project Slayers - https://www.roblox.com/games/5956785391/RELEASE-Project-Slayers
 
-🔴 Mushroom Plumber Simulator (DMCAd) - https://www.roblox.com/games/15975797635/Mushroom-Plumber-Simulator
+🔴 Mushroom Plumber Simulator (DMCA) - https://www.roblox.com/games/15975797635/Mushroom-Plumber-Simulator
